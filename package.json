@@ -54,11 +54,6 @@
 		"gatsby"
 	],
 	"license": "MIT",
-	"husky": {
-		"hooks": {
-			"pre-commit": "pretty-quick --staging"
-		}
-	},
 	"prettier": {
 		"trailingComma": "es5",
 		"arrowParens": "avoid",
