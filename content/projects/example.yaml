@@ -1,0 +1,10 @@
+# example showcase project
+
+title: example
+description: example project
+image: https://example.com/example.png
+git: https://github.com/example
+homepage: https://example.com
+hidden: true
+featured: false
+weight: 100

@@ -1,0 +1,8 @@
+# example showcase project
+
+title: Graphql-ws Client
+description: Client of graphql-ws protocol in modern Rust
+image: https://avatars.githubusercontent.com/u/30779353?v=4&s=400
+git: https://github.com/onichandame/tokio-graphql-ws/
+featured: true
+weight: 5
