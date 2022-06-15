@@ -1,10 +1,8 @@
 ---
-title: "Bypass Domain Censorship"
-author: "onichandame"
+title: 'Bypass Domain Censorship'
+author: 'onichandame'
 date: 2020-12-20
 ---
-
-import {LocalizedLink} from '../../../src/i18n'
 
 <!-- vim-markdown-toc GFM -->
 
@@ -109,16 +107,16 @@ In CloudFlare, the reverse proxy can be achieved in many ways, the most flexible
 [Worker][worker] is a serverless technology offered by CloudFlare. To set up a simple reverse proxy simply masking the true destination, only few lines of code is required to make it work:
 
 ```javascript
-const ORIGIN = "origin.example.com";
-const PORT = `2096`;
-addEventListener("fetch", (event) => {
-  event.passThroughOnException();
-  const url = new URL(event.request.url);
-  url.port = PORT;
-  url.hostname = ORIGIN;
-  const request = new Request(url, event.request);
-  return event.respondWith(fetch(request));
-});
+const ORIGIN = 'origin.example.com'
+const PORT = `2096`
+addEventListener('fetch', event => {
+  event.passThroughOnException()
+  const url = new URL(event.request.url)
+  url.port = PORT
+  url.hostname = ORIGIN
+  const request = new Request(url, event.request)
+  return event.respondWith(fetch(request))
+})
 ```
 
 The worker needs to be configured with a route(subdomain) for convenience, otherwise the access url is something randomized and long.

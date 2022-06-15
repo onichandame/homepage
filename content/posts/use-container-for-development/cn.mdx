@@ -1,30 +1,28 @@
 ---
-title: "用容器开发"
-author: "onichandame"
+title: '用容器开发'
+author: 'onichandame'
 date: 2021-01-09
 ---
 
-import {LocalizedLink} from '../../../src/i18n'
-
 <!-- vim-markdown-toc GFM -->
 
-* [一些思考](#一些思考)
-* [挑战](#挑战)
-  * [Podman](#podman)
-  * [防止容器关闭](#防止容器关闭)
-  * [缩减镜像大小](#缩减镜像大小)
-  * [NOFILE 限制](#nofile-限制)
-  * [UTF-8 编码](#utf-8-编码)
-  * [Windows 10](#windows-10)
-    * [Docker 引擎](#docker-引擎)
-    * [HyperV](#hyperv)
-  * [Kubernetes](#kubernetes)
-    * [集群搭建](#集群搭建)
-      * [Kind](#kind)
-      * [K3D](#k3d)
-  * [端口映射](#端口映射)
-  * [Vim in Docker](#vim-in-docker)
-* [实现](#实现)
+- [一些思考](#一些思考)
+- [挑战](#挑战)
+  - [Podman](#podman)
+  - [防止容器关闭](#防止容器关闭)
+  - [缩减镜像大小](#缩减镜像大小)
+  - [NOFILE 限制](#nofile-限制)
+  - [UTF-8 编码](#utf-8-编码)
+  - [Windows 10](#windows-10)
+    - [Docker 引擎](#docker-引擎)
+    - [HyperV](#hyperv)
+  - [Kubernetes](#kubernetes)
+    - [集群搭建](#集群搭建)
+      - [Kind](#kind)
+      - [K3D](#k3d)
+  - [端口映射](#端口映射)
+  - [Vim in Docker](#vim-in-docker)
+- [实现](#实现)
 
 <!-- vim-markdown-toc -->
 
@@ -102,7 +100,7 @@ podman pod create -p 30000:3000
 
 文件数量限制由一个硬限制和一个软限制组成。当超过软限制时，用户会收到警告；当硬限制被突破时，系统会报错。因此两种限制都需要提升。
 
-我的解决方案是提升宿主机的 NOFILE 限制，容器会自动继承宿主机的配置。详细步骤在<LocalizedLink to={'/post/ulimit'}>此文</LocalizedLink>中。
+我的解决方案是提升宿主机的 NOFILE 限制，容器会自动继承宿主机的配置。详细步骤在<a to={'../ulimit'}>此文</a>中。
 
 ## UTF-8 编码
 

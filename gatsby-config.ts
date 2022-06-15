@@ -16,6 +16,14 @@ export default {
     {
       resolve: `gatsby-source-filesystem`,
       options: {
+        name: `posts`,
+        path: `${__dirname}/content/posts`,
+      },
+    },
+    `gatsby-plugin-mdx`,
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
         path: `${__dirname}/content/locales`,
         name: `locale`,
       },
@@ -28,15 +36,16 @@ export default {
         defaultLanguage: `en`,
         // you can pass any i18next options
         i18nextOptions: {
-          defaultNS: `translation`,
+          preload: [`en`, `cn`],
           keySeparator: false,
-          nsSeparator: `:`,
+          nsSeparator: false,
         },
       },
       pages: [
         {
           matchPath: '/:lang?/blogs/:uid',
           getLanguageFromPath: true,
+          excludeLanguages: ['en', 'cn'],
         },
       ],
     },

@@ -1,53 +1,66 @@
-import { useRouter } from "next/router";
-import { CopyBlock, nord } from "react-code-blocks";
-import rehypeRaw from "rehype-raw";
-import rehypeSlug from "rehype-slug";
-import ReactMarkdown from "react-markdown";
+import { Grid, Typography } from '@mui/material'
+import { graphql, PageProps } from 'gatsby'
+import { MDXRenderer } from 'gatsby-plugin-mdx'
 
-import { Blog } from "../../types/blog";
-import { Box } from "@mui/material";
-
-export const BlogDetail = ({ blog }: { blog: Blog }) => {
-  const router = useRouter();
-  if (!router.locale) throw new Error(`locale not set in blog ${blog.slug}`);
-  const content = blog.content[router.locale];
-  if (!content) {
-    throw new Error(
-      `content for current locale ${router.locale} not available in blog ${blog.slug}`,
-    );
+export default ({
+  data,
+}: PageProps<{
+  blog: {
+    frontmatter: {
+      title: string
+      author: string
+      date: string
+    }
+    body: string
   }
+}>) => {
   return (
-    <Box sx={{ display: `flex`, flexDirection: `column`, maxWidth: `100%` }}>
-      <ReactMarkdown
-        rehypePlugins={[rehypeRaw, rehypeSlug]}
-        components={{
-          p: function ({ children }) {
-            return <Box sx={{ textIndent: `2rem` }}>{children}</Box>;
-          },
-          pre: function ({ children, className }) {
-            return (
-              <Box
-                className={className}
-                component="pre"
-                sx={{
-                  backgroundColor: (theme) => theme.palette.background.default,
-                  overflowX: `auto`,
-                  maxWidth: `100%`,
-                }}
-              >
-                {children}
-              </Box>
-            );
-          },
-          code: function ({ children, className }) {
-            const language =
-              className?.split(`language-`)[1]?.split(` `).pop() || `text`;
-            return <code>{children}</code>;
-          },
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </Box>
-  );
-};
+    <Grid container direction={'column'} alignItems="stretch">
+      <Grid item>
+        <Typography variant={'h3'}>{data.blog.frontmatter.title}</Typography>
+      </Grid>
+      <Grid item>
+        <Grid container justifyContent="space-between" direction="row">
+          <Grid item>
+            <Typography variant={'caption'}>
+              {data.blog.frontmatter.author}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Typography variant={'caption'}>
+              {new Date(data.blog.frontmatter.date).toLocaleString()}
+            </Typography>
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid item sx={{ padding: theme => theme.spacing(2) }}>
+        <MDXRenderer>{data.blog.body}</MDXRenderer>
+      </Grid>
+    </Grid>
+  )
+}
+
+export const query = graphql`
+  query ($language: String!, $title: String!) {
+    locales: allLocale(filter: { language: { eq: $language } }) {
+      edges {
+        node {
+          ns
+          data
+          language
+        }
+      }
+    }
+    blog: mdx(
+      frontmatter: { title: { eq: $title } }
+      fields: { locale: { eq: $language }, sourceInstanceName: { eq: "posts" } }
+    ) {
+      frontmatter {
+        title
+        author
+        date
+      }
+      body
+    }
+  }
+`

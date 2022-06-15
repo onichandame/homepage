@@ -1,10 +1,8 @@
-Now with <LocalizedLink to---
-title: "Use Container for Development"
-author: "onichandame"
+---
+title: 'Use Container for Development'
+author: 'onichandame'
 date: 2021-01-09
 ---
-
-import {LocalizedLink} from '../../../src/i18n'
 
 <!-- vim-markdown-toc GFM -->
 
@@ -102,7 +100,7 @@ When developing a frontend with plenty of source files and dependencies, the dev
 
 The watch file limit is defined by a hard limit and a soft limit. When the soft limit is exceeded, the user is warned. When the hard limit is hit, the watcher's process throws an error. Therefore both limits need to be raised.
 
-The solution is to increase the host's NOFILE limit. The containers automatically inherits the host's limit. <LocalizedLink to={'/post/ulimit'}>Check this</LocalizedLink> for the detailed setup.
+The solution is to increase the host's NOFILE limit. The containers automatically inherits the host's limit. <a to={'../ulimit'}>Check this</a> for the detailed setup.
 
 ## UTF-8 Encoding
 

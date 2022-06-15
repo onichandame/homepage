@@ -10,13 +10,15 @@ import {
   Link,
   Typography,
 } from '@mui/material'
-import { graphql } from 'gatsby'
+import { graphql, PageProps } from 'gatsby'
 import { PropsWithChildren } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Project } from '../types/project'
 
-export default function () {
+export default function ({
+  data,
+}: PageProps<{ featuredProjects: { edges: { node: Project }[] } }>) {
   const { t } = useTranslation()
   return (
     <Grid container direction="column" alignItems="center" spacing={10}>
@@ -33,7 +35,7 @@ export default function () {
       <Divider flexItem />
       <Grid item>
         <Grid container direction="row" justifyContent="center" spacing={10}>
-          {/**projects.map((project, ind) => (
+          {data.featuredProjects.edges.map(({ node: project }, ind) => (
             <Grid item key={ind} sx={{ display: `flex` }}>
               <Card sx={{ width: 240 }} variant="outlined">
                 <CardHeader title={project.title} />
@@ -70,7 +72,7 @@ export default function () {
                 </CardActions>
               </Card>
             </Grid>
-          ))*/}
+          ))}
         </Grid>
       </Grid>
     </Grid>
@@ -99,6 +101,20 @@ export const query = graphql`
           ns
           data
           language
+        }
+      }
+    }
+    featuredProjects: allProjectsYaml(
+      filter: { hidden: { ne: true }, featured: { eq: true } }
+    ) {
+      edges {
+        node {
+          description
+          git
+          homepage
+          image
+          title
+          weight
         }
       }
     }

@@ -1,10 +1,8 @@
 ---
-title: "绕过网站备案限制"
-author: "onichandame"
+title: '绕过网站备案限制'
+author: 'onichandame'
 date: 2020-12-20
 ---
-
-import {LocalizedLink} from '../../../src/i18n'
 
 <!-- vim-markdown-toc GFM -->
 
@@ -109,16 +107,16 @@ site.example.com(Reverse Proxy) ->> origin.example.com(Origin): TLS certified by
 [Worker][worker]本质上是一种 CloudFlare 提供的无服务器技术。仅需几行代码即可启用一个简单的反代：
 
 ```javascript
-const ORIGIN = "origin.example.com";
-const PORT = `2096`;
-addEventListener("fetch", (event) => {
-  event.passThroughOnException();
-  const url = new URL(event.request.url);
-  url.port = PORT;
-  url.hostname = ORIGIN;
-  const request = new Request(url, event.request);
-  return event.respondWith(fetch(request));
-});
+const ORIGIN = 'origin.example.com'
+const PORT = `2096`
+addEventListener('fetch', event => {
+  event.passThroughOnException()
+  const url = new URL(event.request.url)
+  url.port = PORT
+  url.hostname = ORIGIN
+  const request = new Request(url, event.request)
+  return event.respondWith(fetch(request))
+})
 ```
 
 这个 worker 需要与路由（子域名）配合以提供完整方便的解决方案。否则其 url 会是一个非常长的随机字符串。

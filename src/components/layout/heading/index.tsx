@@ -6,12 +6,7 @@ import { TitleLink } from './titleLink'
 
 export const Heading = () => {
   return (
-    <AppBar
-      position="fixed"
-      sx={{
-        backgroundColor: theme => theme.palette.background.paper,
-      }}
-    >
+    <AppBar position="fixed" sx={{}} color="inherit">
       <Toolbar>
         <Grid container direction="row" spacing={3}>
           <Grid item>

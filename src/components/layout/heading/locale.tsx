@@ -4,17 +4,17 @@ import { Button, Menu, MenuItem } from '@mui/material'
 import { useState } from 'react'
 
 export const Locale = () => {
-  const { t, languages, language, changeLanguage } = useI18next()
+  const { languages, language, changeLanguage } = useI18next()
   const [anchor, setAnchor] = useState<null | HTMLElement>(null)
   return (
     <>
       <Button
         variant="contained"
-        color="inherit"
+        color="info"
         endIcon={<KeyboardArrowDown />}
         onClick={e => setAnchor(e.currentTarget)}
       >
-        {t(language, { lng: language })}
+        {getLocalName(language)}
       </Button>
       <Menu open={!!anchor} anchorEl={anchor} onClose={() => setAnchor(null)}>
         {languages.map(lang => (
@@ -25,10 +25,14 @@ export const Locale = () => {
               setAnchor(null)
             }}
           >
-            {t(lang, { lngs: languages, lng: lang })}
+            {getLocalName(lang)}
           </MenuItem>
         ))}
       </Menu>
     </>
   )
+}
+
+function getLocalName(lang: string) {
+  return lang === `en` ? `English` : lang === `cn` ? `中文` : `Unknown`
 }

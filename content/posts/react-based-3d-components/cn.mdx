@@ -1,6 +1,6 @@
 ---
-title: "基于React的3D组件化开发"
-author: "onichandame"
+title: '基于React的3D组件化开发'
+author: 'onichandame'
 date: 2020-05-13
 ---
 
@@ -103,16 +103,16 @@ date: 2020-05-13
 
 ## 加载模型
 
-首要的问题是加载设计师制作的模型。在<LocalizedLink to={'/post/collaboration-using-blender'}>此文</LocalizedLink>中，我实现了将 SolidWorks 模型转换成 Blender 模型。而 Blender 可以将模型输出冲 GLTF 格式。
+首要的问题是加载设计师制作的模型。在<a href={'../collaboration-using-blender'}>此文</a>中，我实现了将 SolidWorks 模型转换成 Blender 模型。而 Blender 可以将模型输出冲 GLTF 格式。
 
 [R3F][r3f]提供了 hook `useLoader`用以和 three 的`GLTFLoader`一起加载 GLTF 模型。
 
 ```typescript
-import { useLoader } from "react-three-fiber"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { useLoader } from 'react-three-fiber'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export const Model = () => {
-  const gltf = useLoader(GLTFLoader, "/static/model.gblb")
+  const gltf = useLoader(GLTFLoader, '/static/model.gblb')
   return <primitive object={gltf.scene} dispose={null} {...other} />
 }
 ```

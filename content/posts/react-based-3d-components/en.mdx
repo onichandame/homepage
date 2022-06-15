@@ -1,10 +1,8 @@
 ---
-title: "React-based 3D Components"
-author: "onichandame"
+title: 'React-based 3D Components'
+author: 'onichandame'
 date: 2020-05-13
 ---
-
-import {LocalizedLink} from '../../../src/i18n'
 
 <!-- vim-markdown-toc GFM -->
 
@@ -105,16 +103,16 @@ The second interaction can be achieved by clicking a reset button in the corner.
 
 ## Model Loading
 
-The first problem encountered is to load the models made by the designer. As stated in <LocalizedLink to={'/post/collaboration-using-blender'}>this post</LocalizedLink>, it is possible to convert models made in SolidWorks to Blender. From Blender, the model can be exported as GLTF files.
+The first problem encountered is to load the models made by the designer. As stated in <a href={'../collaboration-using-blender'}>this post</a>, it is possible to convert models made in SolidWorks to Blender. From Blender, the model can be exported as GLTF files.
 
 [R3F][r3f] provides a hook `useLoader` that can be used in conjunction with `GLTFLoader` from three to dynamically load GLTF files into the model.
 
 ```typescript
-import { useLoader } from "react-three-fiber"
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
+import { useLoader } from 'react-three-fiber'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 export const Model = () => {
-  const gltf = useLoader(GLTFLoader, "/static/model.gblb")
+  const gltf = useLoader(GLTFLoader, '/static/model.gblb')
   return <primitive object={gltf.scene} dispose={null} {...other} />
 }
 ```
