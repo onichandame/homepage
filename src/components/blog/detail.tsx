@@ -41,7 +41,7 @@ export default ({
 }
 
 export const query = graphql`
-  query ($language: String!, $title: String!) {
+  query ($language: String!, $name: String!) {
     locales: allLocale(filter: { language: { eq: $language } }) {
       edges {
         node {
@@ -52,8 +52,11 @@ export const query = graphql`
       }
     }
     blog: mdx(
-      frontmatter: { title: { eq: $title } }
-      fields: { locale: { eq: $language }, sourceInstanceName: { eq: "posts" } }
+      fields: {
+        locale: { eq: $language }
+        name: { eq: $name }
+        sourceInstanceName: { eq: "posts" }
+      }
     ) {
       frontmatter {
         title

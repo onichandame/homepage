@@ -87,15 +87,12 @@ export const createPages: GatsbyNode['createPages'] = async ({
   const postList = blogs.data.blogs.edges.map(v => v.node)
   postList.forEach(post => {
     const { name, locale } = post.fields
-    const { title, author, date } = post.frontmatter
     createPage({
       path: getLocalPath(locale, `/blogs/${name}`),
       component: blogTemplate,
       context: {
         language: locale,
-        title,
-        date,
-        author,
+        name,
       },
     })
   })
