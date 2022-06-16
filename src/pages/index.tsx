@@ -24,7 +24,7 @@ export default function ({
     <Grid container direction="column" alignItems="center" spacing={10}>
       <Grid item mt={theme => theme.spacing(10)}>
         <Typography variant="h5" color="navy">
-          {t(`selfDescription`)}
+          {t(`motto`)}
         </Typography>
       </Grid>
       <Grid item>

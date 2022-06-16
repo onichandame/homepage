@@ -6,21 +6,6 @@ const defLocale: typeof locales[number] = `en`
 const getLocalPath = (locale: string, path: string) =>
   [locale !== defLocale && `/${locale}`, path].filter(v => !!v).join(``)
 
-//export const onCreatePage: GatsbyNode['onCreatePage'] = ({ page, actions ,}) => {
-//  const { createPage, deletePage } = actions
-//  deletePage(page)
-//  Object.keys(locales).map(locale => {
-//    return createPage({
-//      ...page,
-//      path: getLocalPath(locale, page.path),
-//      context: {
-//        ...page.context,
-//        locale,
-//      },
-//    })
-//  })
-//}
-
 export const onCreateNode: GatsbyNode['onCreateNode'] = ({
   node,
   actions,
@@ -34,9 +19,11 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = ({
       name: 'sourceInstanceName',
       value: sourceInstanceName,
     })
-    if (sourceInstanceName === `posts`) {
-      createNodeField({ node, name: 'locale', value: name })
-      createNodeField({ node, name: 'name', value: relativeDirectory })
+    switch (sourceInstanceName) {
+      case `posts`:
+        createNodeField({ node, name: 'locale', value: name })
+        createNodeField({ node, name: 'name', value: relativeDirectory })
+        break
     }
   }
 }

@@ -1,4 +1,9 @@
 {
-  "selfDescription": "Work like a master, learn like an amateur",
-  "featuredProjects": "Featured projects"
+  "motto": "Work like a master, learn like an amateur",
+  "selfDescription": "A little code, a little science, and a little perseverance.",
+  "featuredProjects": "Featured projects",
+  "aboutMe": "About me",
+  "aboutMeContent": "I'm an innovation driven developer who always try new stuff. From frontend to backend, from architecture to implementation, I am experienced in almost every field in the web dev. I am also keen on the most cutting-edge technologies, especially something not so mature but has tremendous potential. IPFS, web3 and Rust are a few examples. Recently I am into data science.",
+  "background": "Backgroud",
+  "backgroundContent": "Graduated from particle physics, I started my career in radiotherapy as a R&D engineer. Soon after the beautiful web and its prosperous community ignited my interest, and I have been in this industry since in 2020. My recent projects are about SaaS products."
 }
