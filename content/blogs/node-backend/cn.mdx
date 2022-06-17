@@ -1,0 +1,57 @@
+---
+title: 'Node.js后端'
+---
+
+本文记录我在开发基于 Node.js 的后端服务过程中遇到的问题。
+
+# POST
+
+通用的处理 POST 请求的库有 2 个：Formidable 和 Body-Parser.
+
+## Formidable
+
+这个库可以处理 field values 和 files。但用的人较少。
+
+## Body Parser
+
+这个库只能处理 field values。它支持 2 种数据结构：url encoded 和 json。
+
+```typescript
+import bodyParser from 'body-parser'
+```
+
+### URL Encoded
+
+```typescript
+server.use(bodyParser.urlencoded({ extended: true }))
+```
+
+### JSON
+
+客户端必须将 header `Content-Type`设成`application/json`，否则 Body Parser 无法理解请求。
+
+```typescript
+server.use(bodyParser.json())
+```
+
+# GFW
+
+由于 GFW 的存在,中国用户经常无法访问 npm registry。为了解决这个问题，阿里的开发者们提供了一个镜像 registry，并每十分钟与官方 registry 同步一次。[这个文档](https://developer.aliyun.com/mirror/NPM?from=tnpm)提供使用这个镜像 registry 的方法。
+
+# 身份&授权
+
+安全管理（身份认证和授权）包含 2 层含义：服务之间的安全和门户服务与用户之间的认证。门户服务是直接对用户开放的服务。
+
+## 用户安全
+
+有几个基本问题需要考虑。
+
+- 安全信息，无论是永久的（密钥）亦或是临时的（登陆有效期），都需要保证可拓展性。具体来说。用户在一个服务实例中登录、注册过后不需要再另外的实例上重新做一遍。
+- 同一工作流的不同服务，或服务于紧密联系的用户的不同服务都需要服从同一安全管理框架。这样每个用户都能保证独一无二，在未来工作流调整时不会带来额外的冲突。
+- 注册机制必须在设计初期固定不变。对内部服务来说，优先考虑邀请制。这样权限模式就可以简化以专注于生产工作流。安全可以由现实中的关系来保证。对开放注册模式来说，必须假设每个用户都是专注于渗透我的系统的专业黑客。
+
+一些有用的技术框架。
+
+- Passport.js
+- MongoDB/Mongoose
+- Express.js

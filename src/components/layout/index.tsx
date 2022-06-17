@@ -1,11 +1,19 @@
-import { Box, CssBaseline, Toolbar } from '@mui/material'
+import {
+  Box,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+  Toolbar,
+} from '@mui/material'
 import { PropsWithChildren } from 'react'
 
 import { Heading } from './heading'
 
+const theme = createTheme({ palette: { mode: `dark` } })
+
 export const Layout = ({ children }: PropsWithChildren) => {
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box sx={{ display: `flex`, maxWidth: `100vw` }}>
         <Heading />
@@ -21,6 +29,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
           {children}
         </Box>
       </Box>
-    </>
+    </ThemeProvider>
   )
 }

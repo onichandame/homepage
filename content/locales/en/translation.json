@@ -1,7 +1,7 @@
 {
-  "motto": "Work like a master, learn like an amateur",
   "selfDescription": "A little code, a little science, and a little perseverance.",
-  "featuredProjects": "Featured projects",
+  "featuredProjects": "Featured Projects",
+  "featuredBlogs": "Featured Blogs",
   "aboutMe": "About me",
   "aboutMeContent": "I'm an innovation driven developer who always try new stuff. From frontend to backend, from architecture to implementation, I am experienced in almost every field in the web dev. I am also keen on the most cutting-edge technologies, especially something not so mature but has tremendous potential. IPFS, web3 and Rust are a few examples. Recently I am into data science.",
   "background": "Backgroud",

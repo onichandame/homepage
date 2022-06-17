@@ -1,0 +1,38 @@
+---
+title: '基于NATS开发'
+---
+
+在做后端开发时，一般认为将服务间通信通过统一的消息层可以使服务们解耦。
+
+[NATS][nats]是一个跨语言的消息层，它提供官方支持的 Golang，TypeScript，Java 等客户端。它与传统的消息服务如 Kafka 的最大差别是 NATS 提供*at-most-once*策略，意味着每个消息最多会被传递给接收方一次，消息传递允许失败，失败的消息传递应该在应用层处理。
+
+*at-most-once*的设计和 PubSub 与事件 emitter/listener 相似。NATS 还提供一个非常有用的功能，request-reply，即发送者会等到至少一个接收者做出回复。
+
+# 开发设置
+
+为基于 NATS 做开发，必须解决一些基本的问题。
+
+## 模拟 NATS 客户端
+
+为建立一个可靠的服务，必须做单元测试。一个常用的方法是在单元测试中模拟所有需要的外部资源。NATS 连接就是一个需要模拟的资源。
+
+[这个仓库][orig-mock]提供一个 JavaScript 的模拟客户端，但它有一些问题：没有 type，也不能支持全部的 subscription 配置。
+
+因此我制作了[我的 fork][mock]，并以`@onichandame/mock-nats-client`为名发布。这个 fork 用 TypeScript 编写，且使用原始 NATS 客户端的 type。因此模拟的方法都和原始的方法有同样的 signature。
+
+## 启动 NATS 服务器
+
+有时多个客户端需要互相通信，这时模拟的客户端就不能满足要求了，此时就需要启动一个真实的 NATS 服务器。我制作了[这个库][nats-server]来满足这个需求。但是它不能在 Github Action 或者 Windows 平台上使用。
+
+## Github Action
+
+为在 Github Action 上启动测试用 NATS 服务器或集群，我制作了[这个 action][nats-action]用以启动服务器或集群，和[这个 action][nats-client]用以测试服务器或集群是否在线。
+
+# 授权管理
+
+[nats]: https://nats.io/
+[orig-mock]: https://github.com/FrostDigital/mock-nats-client
+[mock]: https://github.com/onichandame/mock-nats-client
+[nats-server]: https://github.com/onichandame/nats-server
+[nats-action]: https://github.com/onichandame/nats-action/
+[nats-client]: https://github.com/onichandame/nats-client-action/

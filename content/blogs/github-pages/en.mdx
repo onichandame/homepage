@@ -1,0 +1,53 @@
+---
+title: 'Github Pages'
+---
+
+Many of my personal projects are frontend libraries. These projects ought to be published with a demo website where the users can conveniently view the outcome without cloning or building. However, web hosting is not so cheap that every one of my projects is worth the service.
+
+[Github Pages(Pages)][pages] provides a cheap(free) solution. Here I record the tricks I found in using Pages.
+
+# Github Actions
+
+[The guide][pages] has a comprehensive guide of publishing a user-scope website. But it does not formularize the development workflow.
+
+[Github Actions(Actions)][actions] is a great CI/CD automation tool. Using this tool, the publication of the pages can be kept sync with the development automatically.
+
+By default the sources of the website should be pushed to the branch `gh-pages`. Thanks to [this action][push], the whole process can be automated.
+
+```yaml
+ghpage-publish:
+  name: ghpage-publish
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@master
+    - name: Set up Node.js
+      uses: actions/setup-node@master
+      with:
+        node-version: 14.x
+    - name: Set up dependency
+      run: yarn install --frozen-lockfile
+    - name: Build pages
+      run: yarn build:docs
+    - name: Publish
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: docs
+```
+
+The above action pre-assumes that the project is based on Node.js, and that `yarn` is used as the package manager, and that `build:docs` script builds the website into /docs directory. When the action succeeds, the `gh-pages` branch contains the latest website.
+
+One annoying thing is when it `gh-page` is created for the first time, it has to be done manually. Otherwise the publishing is never triggered. This might be a bug but I haven't seen any issue about it. Another workaround is to manually trigger it via `curl -X POST -i -u "<username>" https://api.github.com/repos/<username>/<reponame>/pages/builds` according to [this guide][api].
+
+# Personal Homepage
+
+Pages not only provides web hosting for projects, but also for users. Each github user is able to host 1 user-scope website. The source is stored in the repo `<username>.github.io`
+
+The `master` branch of this repo contains all the sources. But in many cases the website itself is built from other sources, such as React. If it is the case, it is necessary to maintain an `source` branch that contains the source files. Actions can then be used to build and publish the website.
+
+[pages]: https://pages.github.com/
+[actions]: https://github.com/actions
+[push]: https://github.com/JamesIves/github-pages-deploy-action
+[api]: https://developer.github.com/v3/repos/pages/

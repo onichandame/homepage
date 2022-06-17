@@ -1,0 +1,214 @@
+---
+title: 'Single Node K8s in China'
+---
+
+# Scenario
+
+My new project needs to run on a remote physical machine. The project itself is coposed of many microservices. Therefore the best way to deploy is container orchestration. But the constraints of k8s plus physical machine plush China introduces many complexities to the setup.
+
+# Materials
+
+The materials in hand are:
+
+- one physical server
+  - CPU：E3-1220v6
+  - RAM：32GB
+  - HDD：4TB
+- A series of vacant IP address in LAN
+
+# Procedures
+
+## Install OS
+
+I choose the latest CentOS 7 as CentOS 8 still lacks the official support to docker. If choose not to use docker or containerd, CentOS 8 is fine. Other distros are not recommended here as I haven't tried them.
+
+## Configure Firewall
+
+According to the [official docs][adm], the master and the worker require 7 ports and 1 series of ports open. According to [the docs][flannel], 2 more ports need to be open in order to use flannel. And according to [the docs][nginx], port 80 and 443 need to be opened.
+
+```bash
+firewall-cmd --zone=public --permanent --add-port=443/tcp
+firewall-cmd --zone=public --permanent --add-port=80/tcp
+firewall-cmd --zone=public --permanent --add-port=6443/tcp
+firewall-cmd --zone=public --permanent --add-port=2379-2380/tcp
+firewall-cmd --zone=public --permanent --add-port=10250-10252/tcp
+firewall-cmd --zone=public --permanent --add-port=8285/tcp
+firewall-cmd --zone=public --permanent --add-port=8472/tcp
+firewall-cmd --reload
+```
+
+## Setup Bridge
+
+According to the [official docs][adm], the network bridge needs to be setup.
+
+```bash
+cat <<EOF > /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+sysctl --system
+```
+
+Note: Check the output of `lsmod | grep br_netfilter`is not empty before running the above commands. If empty, it is requried to run `modprobe br_netfilter` and check again.
+
+## Setup Container Runtime
+
+I choose to use docker. The detailed steps are described [here](https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker). But I did it according to the CentOS's official recommendation. If you choose containerd or cri-o, please refer to the official guides.
+
+```bash
+yum install epel-release -y
+yum install docker-ce -y
+```
+
+## Install kubectl, kubelet and kubeadm
+
+Next step is to install the deployment tools.
+
+```bash
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+
+# Set SELinux in permissive mode (effectively disabling it)
+setenforce 0
+sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+
+systemctl enable --now kubelet
+```
+
+Now that kubelet is ready to use. The next step is to bootstrap the cluster.
+
+## Boot
+
+Having done all the steps above, it is time to boot the cluster.
+
+```bash
+kubeadm init --pod-network-cidr=10.244.0.0/16 --image-repository registry.cn-hangzhou.aliyuncs.com/google_containers
+```
+
+As I choose to use flannel, `--pod-network-cidr=10.244.0.0/16` is required. As I am deploying in China, a mirror is required `--image-repository registry.cn-hangzhou.aliyuncs.com/google_containers`.
+
+The `kubeadm join <control-plane-host>:<control-plane-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>` part from the output needs to be recorded in case new nodes will be added in the future.
+
+## Setup kubectl
+
+如果当前用户非 root，需要配置 kubectl 以连接集群。
+If the current user is not root, kubectl needs to be configured in order to connect to the cluster.
+
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+If the current user is root, `export KUBECONFIG=/etc/kubernetes/admin.conf` is requried to setup kubectl.
+
+## Install Network Plugin
+
+As k8s is designed for cluster, pods from different hosts require a network plugin to communicate through LAN. According to [the official docs][flannel], I choose flannel. I have seen a report that other plugins fail as DNS where flannel is stil functional. The source of the report is lost in my memory though.
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
+```
+
+## Turn off Master Protection
+
+k8s by default does not allow master to run non-system pods. But I need to run workloads on master so this protection needs to be turned off.
+
+```bash
+kubectl taint nodes --all node-role.kubernetes.io/master-
+```
+
+## Install Load Balancer
+
+On the cloud like AWS or GKE, service can retrieve a public IP easily using LoadBalancer. But this function depends on the cloud provider's load balancer. Now it is requried to install a load balancer. I choose MetalLB. [Here][metallb] is the official docs.
+
+Firstly edit the kube-proxy configuration:
+
+```bash
+kubectl edit configmap -n kube-system kube-proxy
+```
+
+Add `strictARP: true` under `ipvs`.
+
+I haven't learned the fundamental reasons behind this, but I guess that it has something to do with the arp mechanism.
+
+Now it is ready to deploy MetalLB service:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.9.3/manifests/namespace.yaml
+kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.9.3/manifests/metallb.yaml
+kubectl create secret generic -n metallb-system memberlist --from-literal=secretkey="$(openssl rand -base64 128)"
+```
+
+Now that you can check if MetalLB related containers are online using `kubectl get pods --all-namespaces`.
+
+The next step is to configure MetalLB. In a nutshell MetalLB needs to know what IP addresses can be distributed to the services.
+
+Open a new yaml file and add the content:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.1.240-192.168.1.250
+```
+
+The addresses value specifies the available IP addresses. All other configurations can be left unchanged.
+
+MetalLB can now be deployed by `kubectl apply -f <config file>`.
+
+The cluster can now deploy service of the type LoadBalancer.
+
+## Install Ingress Controller
+
+LoadBalancer is the most common service type, but a bunch of IP is not easy to manage. Since k8s 1.1 there is a new resource type of Ingress. It functions like Apache or Nginx to provide a more convenient control over the incoming traffic.
+
+One of Ingress's functions is the route according to the domain. For instance there are 2 domains now, aaa.com and bbb.com each served by server A and server B. After domain resolution both are pointing to the same IP, the IP of the node where the Ingress controller is run. When a viewer visits aaa.com, Ingress routes the traffic to server A. The same logic applies to the server B.
+
+To be able to use Ingress, an Ingress Controller needs to be installed.
+
+I choose Nginx-Ingress. The first step is to clone the configuration files.
+
+```bash
+git clone https://github.com/nginxinc/kubernetes-ingress/ --single-branch --branch v1.6.3
+```
+
+Now cd into the sub directory deployments and run the following commands in order.
+
+```bash
+kubectl apply -f common/ns-and-sa.yaml
+kubectl apply -f rbac/rbac.yaml
+kubectl apply -f common/default-server-secret.yaml
+kubectl apply -f common/nginx-config.yaml
+kubectl apply -f common/custom-resource-definitions.yaml
+kubectl apply -f daemon-set/nginx-ingress.yaml
+```
+
+Now check if nginx-ingress is online using `$ kubectl get pods --namespace=nginx-ingress`.
+
+# Conclusion
+
+Now if everything went fine, a single-node k8s cluster is ready to use. All features of k8s 1.18 are supported.
+
+[adm]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+[flannel]: https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
+[nginx]: https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-manifests/
+[metallb]: https://metallb.universe.tf/installation/

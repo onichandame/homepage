@@ -1,0 +1,25 @@
+---
+title: 'DDNS using QCloud and Container'
+---
+
+Recently I bought a domain. I wish to use DDNS to achieve the same result as static IP.(a top domain costs dozens of RMB whereas a static IP costs thousands)
+
+# Design
+
+At the server side, QCloud provdes REST API for many of its services. The QCloud domain API can be utilized to programmatically update the secondary domain record.
+
+At the client side, cUrl can be utilized to fetch the public IP address and reach the REST endpoints. Then implementation details are recorded [here](https://blog.csdn.net/dragon2k/article/details/88016755). However, to achieve DDNS, this script needs to be run periodically. There are many ways to do it.
+
+1. periodically run a cron job
+2. periodically run a script using watch, and run watch once on reboot using cron
+3. run script with watch using docker's `--restart always` flag
+
+The first method is the simplest one. The only customization is the parameters. Setting up a cron job is dead easy. The con of it is that the same setup process has to be repeated for every setup. The secrets will need to be stored in plain text, which is a big no.
+
+The second approach is similar with the first one, with the setup process simplified.
+
+The third method is the best. First of all, all parameters can be passed to container using env variables. No plain text is required. To setup a new DDNS on a new machine, only 1 line of command is required without editing any configuration.
+
+# Implementation
+
+As a result, I wrote [an image](https://github.com/onichandame/qcloud-ddns). All needed is to setup `DOMAIN`, `SUBDOMAIN`, `RECORD_ID`, `SECRET_KEY` and `SECRET_ID` at runtime.

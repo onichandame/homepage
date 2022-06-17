@@ -20,13 +20,11 @@ export default function ({
   data,
 }: PageProps<{ featuredProjects: { edges: { node: Project }[] } }>) {
   const { t } = useTranslation()
+  const featuredProjects = data.featuredProjects.edges
+    .map(v => v.node)
+    .sort((a, b) => b.weight - a.weight)
   return (
     <Grid container direction="column" alignItems="center" spacing={10}>
-      <Grid item mt={theme => theme.spacing(10)}>
-        <Typography variant="h5" color="navy">
-          {t(`motto`)}
-        </Typography>
-      </Grid>
       <Grid item>
         <Typography variant="h6" fontStyle="oblique" color="gray">
           {t(`featuredProjects`)}
@@ -35,7 +33,7 @@ export default function ({
       <Divider flexItem />
       <Grid item>
         <Grid container direction="row" justifyContent="center" spacing={10}>
-          {data.featuredProjects.edges.map(({ node: project }, ind) => (
+          {featuredProjects.map((project, ind) => (
             <Grid item key={ind} sx={{ display: `flex` }}>
               <Card sx={{ width: 240 }} variant="outlined">
                 <CardHeader title={project.title} />
@@ -104,8 +102,12 @@ export const query = graphql`
         }
       }
     }
-    featuredProjects: allProjectsYaml(
-      filter: { hidden: { ne: true }, featured: { eq: true } }
+    featuredProjects: allYaml(
+      filter: {
+        hidden: { ne: true }
+        featured: { eq: true }
+        fields: { sourceInstanceName: { eq: "projects" } }
+      }
     ) {
       edges {
         node {

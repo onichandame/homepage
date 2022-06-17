@@ -1,0 +1,30 @@
+---
+title: 'Private Network Drive'
+---
+
+Living in the age of internet, the demand of network storage is never met. There are many use cases:
+
+- Store images and videos filmed by smart phones to save the local disk for apps
+- Store the backup of apps or mobile systems to make use of the recovery tools
+- Share files with friends
+- and more...
+
+There are cloud services targeting these demands. However, they are very limited in terms of storage capacity, long-term reliability and cost efficiency. A better solution will be to set up a private cloud.
+
+# WebDav
+
+[WebDav][webdav] is a HTTP-based file serving protocol. It basically maps the CRUD operation on files to POST/GET/PUT/DELETE requests. [WebDav][webdav] has everything supported by HTTP protocol, including basic authentication and TLS encryption.
+
+I personally use the basic authentication to secure my private shared folder. To share with others, more complicated authentication strategy is required, which is not discussed here.
+
+To set up a WebDav server, one can make use of container. [This image][container] is a good helper if only basic authentication is required.
+
+To use a WebDav server on Windows, the network drive mapper is required. However, an authentication problem comes in to way after all the correct setup. [This post][windows] has a rescue.
+
+1. make sure the `WebClient` service is up
+2. edit `HKEY_LOCAL_MACHINE > SYSTEM > CurrentControlSet > Services > WebClient> Parameters` in the registry so that the `BasicAuthLevel` is set to 2
+3. reboot Windows
+
+[webdav]: https://en.wikipedia.org/wiki/WebDAV
+[container]: https://github.com/sashgorokhov/docker-nginx-webdav
+[windows]: https://support.netdocuments.com/hc/en-us/articles/205212850-WebDAV-as-a-Mapped-Drive

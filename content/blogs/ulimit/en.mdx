@@ -1,0 +1,19 @@
+---
+title: 'ulimit on CentOS 8.1'
+---
+
+# Problem
+
+On a fresh-installed Centos 8.1(kernel 4.18.0-147.8.1.el8_1) machine, the max number of opened file descriptors is set to H: 2048, S: 1024.
+
+By editing `/etc/security/limits.conf` the limits can be upped. But this only takes effect in non-gnome-terminals, such as ssh sessions.
+
+# Cause
+
+The gnome terminals do not see `/etc/security/limits.conf` during login as they are started under systemd(I hate it).
+
+# Fix
+
+According to [this](https://www.linuxquestions.org/questions/linux-server-73/increasing-ulimit-open-files-not-applied-in-rhel-8-1-a-4175672919/), `/etc/systemd/user.conf` sets the soft limit and `/etc/systemd/system.conf` sets the hard limit for the user under systemd. The variable for file descriptors is `DefaultLimitNOFILE`.
+
+If you are using Node.js, one more step is required: `echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p` according to [this issue](https://github.com/gatsbyjs/gatsby/issues/11406).

@@ -1,0 +1,19 @@
+---
+title: 'CentOS 8.1中的ulimit'
+---
+
+# 问题
+
+在新安装的 Centos 8.1(kernel 4.18.0-147.8.1.el8_1)上，最大同时打开文件数量的限制是 H: 2048, S: 1024。
+
+在`/etc/security/limits.conf`中可调整限制，但这个调整仅在非 gnome-terminal 中有效，例如 ssh。
+
+# 原因
+
+gnome-terminal 不受`/etc/security/limits.conf`影响，因为它由 systemd 直接控制。
+
+# 修复
+
+基于[此文](https://www.linuxquestions.org/questions/linux-server-73/increasing-ulimit-open-files-not-applied-in-rhel-8-1-a-4175672919/)，在 systemd 中，`/etc/systemd/user.conf`控制用户的软限制而`/etc/systemd/system.conf`控制用户的硬限制。控制文件打开数量的变量是`DefaultLimitNOFILE`。
+
+根据[此处](https://github.com/gatsbyjs/gatsby/issues/11406)，如果使用 Node.js，还需运行`echo fs.inotify.max_user_watches=524288 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p`。

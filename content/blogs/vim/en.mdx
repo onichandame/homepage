@@ -1,0 +1,29 @@
+---
+title: 'Vim'
+---
+
+Vim is a great tool created in the last century but still thrives nowadays. It is mostly used as a light-weight editor for hot fixing maintenance problems. However, being in the market for so long that it has built up an extensive plugins ecosystem that makes it suitable for daily coding.
+
+This post mainly records my experience of using Vim as an IDE.
+
+# Choice of Distribution
+
+Just like other old-school softwares evolved from the golden age of the open-source era, Vim has a lot of different flavours, or distributions or forks. The first choice is to choose the distribution to install. Thankfully, the community is not too large to inspect all the parties. There are 2 competing distributions leading the market: Neovim and Vim 8. These are essentially parallel forks of the old Vim. The main difference being Neovim is community-driven whereas Vim 8 is dictated by Tim Pope(the creator of Vim).
+
+I personally prefer Neovim as it has better plugins ecosystem than its competitors. The marvelous plugins like [coc.nvim][coc] are developed mainly against Neovim.
+
+# Plugins
+
+The power of Vim can only be fully unleashed with the support of plugins. In this section I record some of my favourite ones and how to use them.
+
+The first task is to choose a plug-in manager. My choice is [Vim-Plug][plug].
+
+## Status Line
+
+In traditional IDEs like VsCode, many status info, such as file name, are displayed on the bottom line of the screen. Vim has native support for such feature, but very difficult to configure. This is where a plug-in becomes helpful. [Airline][airline] is a highly extensible plug-in yet comes with a decent default configuration.
+
+Apart from installing the plug-in, one more issue needs to be done manually. The status line requires many non-standard glyphs and fonts to work well. The most suitable font is the Power Line variant. The installation process differs on different OS.
+
+[coc]: https://github.com/neoclide/coc.nvim
+[airline]: https://github.com/vim-airline/vim-airline
+[plug]: https://github.com/junegunn/vim-plug

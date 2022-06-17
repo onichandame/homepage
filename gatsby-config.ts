@@ -6,18 +6,19 @@ export default {
   },
   jsxRuntime: `automatic`,
   plugins: [
-    `gatsby-transformer-yaml`,
+    { resolve: `gatsby-transformer-yaml`, options: { typeName: `Yaml` } },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
+        name: `projects`,
         path: `${__dirname}/content/projects`,
       },
     },
     {
       resolve: `gatsby-source-filesystem`,
       options: {
-        name: `posts`,
-        path: `${__dirname}/content/posts`,
+        name: `blogs`,
+        path: `${__dirname}/content/blogs`,
       },
     },
     `gatsby-plugin-mdx`,

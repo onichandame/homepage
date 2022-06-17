@@ -1,0 +1,47 @@
+---
+title: 'IPFS'
+---
+
+作为一个可能最符合下一代 web 的技术，IPFS 提供了一个完整的技术栈用以代替现有的 HTTP 协议栈。本文记录我在应用 IPFS 开发 web 时遇到的一些问题。
+
+# 启动 IPFS 守护程序
+
+虽然[js-ipfs][js]可以在所有主流浏览器中启动 IPFS 节点，但这样会产生很多问题。有代表性的 2 个问题是浏览器中不支持 DHT，且仅能维护较少的 peers。这些问题导致在浏览器中的数据获取非常慢。当然，官方内置了一个解决方案，即使用<https://ipfs.io>的 HTTP 端点执行 IPFS 操作而非直接使用 p2p 技术。但仍然有问题无法解决。这个方案与 IPFS 的分布式的理念不符，因此给使用环境带来了一个无法替代的单点。比如在中国，<https://ipfs.io>已经被墙，因此这个方案需要配合一些技术手段才能在中国使用。
+
+因此，在现阶段需要在本地运行一个 IPFS 守护程序，其它本地运行的程序可以使用 REST API 利用这个本地的守护程序执行 IPFS 操作。
+
+IPFS 守护程序需要在系统环境中做操作，比如硬盘的 I/O 和长时间占用带宽等问题。为将其与其它程序隔离，此程序应该在一个容器化的环境中运行。
+
+现在有 2 个问题需要解决：
+
+1. 保持数据不受容器生命周期的影响
+2. 允许外界实体使用 REST API
+
+第一个问题可以简单地用加载宿主机文件系统的方式解决。但是第二个问题需要一些操作。
+
+为将 API 暴露给外界，5001 端口必须被映射至宿主机。真正的难点在于禁用 CORS 保护。CORS 设置保存在一个处于数据目录下的配置文件中，而数据目录又需要从宿主机中加载，因此当容器中的数据目录被宿主机的数据目录覆盖时，相关配置会被覆盖掉。完美的解决方案是将配置独立出来，但作为一个用户我没有足够的影响力。因此当容器初次运行时需要执行一些手动操作。
+
+```bash
+# mount folders and map ports
+docker run -d --name ipfs -v <path to staging directory>:/export -v <path to data directory>:/data/ipfs --restart always -p 4001:4001 -p 8080:8080 -p 5001:5001 onichandame/ipfs:latest
+
+# access the tty of the container
+docker exec -it ipfs ash
+
+# disable CORS
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET", "POST"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Headers '["Authorization"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Expose-Headers '["Location"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials '["true"]'
+
+# restart container to take effect the configuration
+docker rm -f docker
+docker run -d --name ipfs -v <path to staging directory>:/export -v <path to data directory>:/data/ipfs --restart always -p 4001:4001 -p 8080:8080 -p 5001:5001 onichandame/ipfs:latest
+```
+
+现在这个守护程序可以从宿主机上操作。在宿主机上使用`curl -X POST http://localhost:5001/api/v0/id`可以检查 API 是否可用。
+
+上述步骤仅在第一次启动时需要，容器重启时存储在宿主机上的配置文件会自动加载并应用。
+
+[js]: https://github.com/ipfs/js-ipfs

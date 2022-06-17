@@ -1,0 +1,30 @@
+---
+title: 'CentOS 8 Bluetooth Headset'
+---
+
+On a fresh-new CentOS 8 desktop, it is not trivial to get a Bluetooth headset connected for the first time.
+
+# Symptoms
+
+When trying to connect to a paired headset in Bluetooth settings, it keeps failing but not error log can be seen. The logs can be retrieved by running command `journalctl -xe` and scroll up to find the read lines similar to `a2dp-sink profile connect failed for 5C:C6:E9:B9:9D:DE: Protocol not available`.
+
+This error message tells that the bluetooth service successfully identifies the headset, but having trouble to hand over the connection to the audio service.
+
+# Fix
+
+The most common audio service shipped with CentOS is pulseaudio. The quick fix is to restart the pulseaudio service.
+
+```bash
+pulseaudio -k
+pulseaudio --start
+```
+
+Note that both commands are meant to be run as non-root user.
+
+# Note
+
+If using Firefox, make sure to upgrade to ver. 71+ as older versions were not shipped with built-in mp3 codec.
+
+# Credits
+
+Thanks to [this question](https://unix.stackexchange.com/questions/258074/error-when-trying-to-connect-to-bluetooth-speaker-org-bluez-error-failed)

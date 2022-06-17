@@ -1,0 +1,27 @@
+---
+title: 'React Native Development'
+---
+
+[React Native(RN)][rn] is a cross-platform development tool that endeavours the ideal "write once and run everywhere". Here records my experiences in learning RN.
+
+# Solved Problems
+
+This section exclusively records what I have learnt that [RN][rn] can solve.
+
+## Code Re-use across Android-iOS-Web
+
+The basic functionality of [RN][rn] is to reuse codes in the same app built for different platforms. The basic syntax for the cross-platform codes is [JSX][jsx].
+
+## Light-weight Development Environment(Expo)
+
+If all the build processes are run locally, an enormous amount of toolchains are required to be installed locally, e.g. Android/iOS SDK. [Expo][expo] is a generous platform that allows everyone to build apps without a complete local environment. The most useful commands are:
+
+- **expo build:android**: can also build ios app and web bundles
+- **expo start:web**: can also start development server for android and iOS
+
+- note 1: I usually use `expo start:web -m tunnel` as I believe that the tunnel mode allows the server to be masked by forward proxies
+- note 2: To run the web server on a custom port, set the environment variable `WEB_PORT` to the desired port. to the desired port.
+
+[rn]: https://reactnative.dev/
+[jsx]: https://reactjs.org/docs/introducing-jsx.html
+[expo]: https://docs.expo.io/

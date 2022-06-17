@@ -1,0 +1,96 @@
+---
+title: '链接IPFS'
+---
+
+[IPFS][ipfs]的设计初衷是建立下一代 web 的基础，并希望可以替代旧有的 HTTP 网络。但它的潜力远超它的最初设计。
+
+IPFS 所基于的，由[libp2p][libp2p]连接起来的的 p2p 网络, 足以为很多有趣且有用的应用提供基础设施。
+
+所有节点都需要的设置如下：
+
+```bash
+ipfs config --json Experimental.Libp2pStreamMounting true
+ipfs config --json Swarm.EnableAutoRelay 'true'
+```
+
+第一个命令允许在不同节点之间开启长连接。第二个命令则启动对中继节点的自动发现和自动使用。
+
+# Windows 配置
+
+如果有至少一个节点在 Windows 机器上，在进入应用配置之前需要做一些前期配置。
+
+## WSL 2
+
+最新版的 WSL 2 是一个 Windows 平台上超轻量超快速的 Linux 环境。一般情况下，能在 WSL 2 内运行的程序都应尽量在其中运行。因此我在其中运行了一个 go-ipfs 实例并将其用于多种场景下的服务器。
+
+## 重启时自启动
+
+服务器的基本要求包括在系统重启时自启动所有服务。可以用 Windows 任务计划来实现。
+
+下列服务应在系统重启时启动：
+
+1. IPFS 节点: `ipfs daemon`
+2. sshd 实例: `/usr/sbin/sshd` (if used as an SSH server)
+
+下面描述的端口映射服务也需要在任务计划中自启动。
+
+# 连接配置
+
+大部分现有的应用都基于地址导向的路由。但 IPFS 的大部分应用场景是内容导向。这个不同会导致很多简单的应用出现问题。
+
+为连接 2 个 IPFS 节点，需要建立一个从一个节点到另一个节点的连接。
+
+下面的命令可以连接 2 个节点：
+
+```bash
+ipfs ping <Server ID>
+ipfs swarm connect /p2p/<Server ID>
+```
+
+当直接连接不成功时，仅需 ping 服务器即可。
+
+# 跨 NAT 的 SSH 连接
+
+[SSH][ssh]是一个给予 TCP 连接的远程登陆工具。IPFS 提供[一个测试版服务][tunnel]用于在任何传统网络拓扑结构上连接任意两个节点。因此，它可以将位于 NAT 后的节点连接起来。
+
+## 服务器配置
+
+服务器需要侦听连接并将其导向 sshd 实例。
+
+```bash
+ipfs p2p listen /x/ssh /ip4/127.0.0.1/tcp/22
+```
+
+## 客户端配置
+
+客户端的配置非常类似。我制作了[一个 docker 镜像][client]用于客户端配置。Dockerfile 在[这里][clientdf]。这个镜像还能作为服务器使用，仅需运行`/usr/sbin/sshd`即可。
+
+# 网络代理
+
+一个经典的应用场景是在服务器上运行一个 web 服务并从客户端处获取服务。常用的协议都基于 TCP。为建立 TCP 连接，下列步骤需要依次执行。
+
+## 服务器
+
+服务器需要侦听端口。
+
+```bash
+ipfs p2p listen /x/kickass/1.0 /ip4/127.0.0.1/tcp/<Server port>
+```
+
+## 客户端
+
+客户端需要将服务器暴露出的端口代理至一个本地端口。
+
+```bash
+ipfs p2p forward /x/kickass/1.0 /ip4/0.0.0.0/tcp/<Local port> /p2p/<Server port>
+```
+
+现在可以通过 *Local port*访问服务器了。
+
+[ipfs]: https://ipfs.io/
+[libp2p]: https://github.com/libp2p/specs
+[ssh]: https://en.wikipedia.org/wiki/Ssh_(Secure_Shell)
+[tunnel]: https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipfs-p2p
+[clientdf]: https://github.com/onichandame/docker-ipfs/blob/ssh/Dockerfile
+[client]: https://hub.docker.com/layers/onichandame/ipfs/ssh/images/sha256-7bbfb56ab201408539b6735409f5a6d737609bc06f8461a2d568cb3495203ce9?context=explore
+[nat]: https://docs.libp2p.io/concepts/nat/

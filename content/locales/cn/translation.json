@@ -1,7 +1,7 @@
 {
-  "motto": "专业地做 虚心地学",
   "selfDescription": "代码，科学，恒心",
   "featuredProjects": "推荐项目",
+  "featuredBlogs": "推荐文章",
   "aboutMe": "关于我",
   "aboutMeContent": "我喜欢探索有趣的领域。web开发的所有技术基本都有涉猎，如前后端开发和架构设计等等。同时也喜欢尝试新东西，尤其是那些尚不成熟但有极大可能性的东西，如IPFS、web3和Rust等。最近对数据科学产生了很大兴趣。",
   "background": "我的经历",

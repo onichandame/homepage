@@ -1,0 +1,47 @@
+---
+title: 'IPFS'
+---
+
+As an approach(probably the best approach) to the next generation web, IPFS emerged as a complete stack aiming to replace the current HTTP protocol. This post records my efforts in developing web services based on IPFS.
+
+# Running IPFS Daemon
+
+Although [js-ipfs][js] can instantiate an IPFS node in every major browser, it has some severe limitations. Small number of peers and not supporting DHT are the 2 main issues concerned. These result in unusably slow queries. Although a workaround is used internally, querying the <https://ipfs.io> through HTTP instead of searching for the file in a p2p way, still some limitations cannot be bypassed. Such workaround breaks the idea of distributed web emphasized by IPFS itself, bringing in a single point of failure to the network. The <https://ipfs.io> has already been censored by Chinese government, therefore such workaround needs some more hacks to work in China.
+
+At the current stage, running an IPFS daemon locally is hence desired. The apps running on the local machine can therefore make use of the daemon through the REST API.
+
+IPFS daemon should be allowed to mess up the environment, such as I/O to the filesystem and consuming certain amount of bandwidth over a long time. To keep it isolated from other applications, the daemon should be kept in a containerized environment.
+
+There are 2 concerns now:
+
+1. Keep data persistent over container restarts
+2. Allow entities from outside the container to access the REST API
+
+The first issue can be solved by simply mounting the host filesystem to the container. But the second issue requires some work.
+
+To expose the REST API, port 5001 must be mapped to a port on the host. The tricky part is to disable the CORS protection. The CORS settings are saved in a file residing in the data directory which is mounted from the host filesystem. Therefore the configuration is lost when the data directory is overwritten by a host directory. A graceful solution would be separating the data and configuration. But I as a user have no word on it. Therefore a manual step is required after the container is initiated.
+
+```bash
+# mount folders and map ports
+docker run -d --name ipfs -v <path to staging directory>:/export -v <path to data directory>:/data/ipfs --restart always -p 4001:4001 -p 8080:8080 -p 5001:5001 onichandame/ipfs:latest
+
+# access the tty of the container
+docker exec -it ipfs ash
+
+# disable CORS
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["GET", "POST"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Headers '["Authorization"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Expose-Headers '["Location"]'
+ipfs config --json API.HTTPHeaders.Access-Control-Allow-Credentials '["true"]'
+
+# restart container to take effect the configuration
+docker rm -f docker
+docker run -d --name ipfs -v <path to staging directory>:/export -v <path to data directory>:/data/ipfs --restart always -p 4001:4001 -p 8080:8080 -p 5001:5001 onichandame/ipfs:latest
+```
+
+Now the daemon can be accessed from host. Try to run `curl -X POST http://localhost:5001/api/v0/id` on the host to check if the API is accessible.
+
+The steps above are only needed once at the initial setup. On restarts the configuration stored in the mounted volume will automatically be active.
+
+[js]: https://github.com/ipfs/js-ipfs

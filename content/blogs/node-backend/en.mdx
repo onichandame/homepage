@@ -1,0 +1,57 @@
+---
+title: 'Node.js Backend'
+---
+
+Here I record the issues found during the development of backend services running in Node.js.
+
+# POST
+
+There are 2 commonly used libraries to handle POST request: Formidable and Body-Parser.
+
+## Formidable
+
+This tool can handle both field values and files. It is less popular than it's counterpart though.
+
+## Body Parser
+
+This tool can handle only field values. There are 2 formats: url encoded and json.
+
+```typescript
+import bodyParser from 'body-parser'
+```
+
+### URL Encoded
+
+```typescript
+server.use(bodyParser.urlencoded({ extended: true }))
+```
+
+### JSON
+
+The client must set header `Content-Type` to `application/json` for Body Parser to understand the request.
+
+```typescript
+server.use(bodyParser.json())
+```
+
+# GFW
+
+For users in China, npm registry is often unavailable due to censorship. To solve this problem, the developers at Alibaba made a mirror registry which is synced with the official registry every 10 minutes. [This docs](https://developer.aliyun.com/mirror/NPM?from=tnpm) tells how to use this registry.
+
+# Authentication & Authorization
+
+The auth(authentication and authorization) is a 2-fold problem. It includes the auth between services and the auth between the end user and the gateway service. The gateway service is the one that is exposed to the end users.
+
+## Auth of End User
+
+There are several keystones to consider.
+
+- The auth data, permanent(credentials) or temporary(session) must be horizontally scalable. To be specific, a user registered with or logged in a gateway service should not have to do the registration/login all over again when using another gateway instance of the same kind.
+- The different services in the same workflow or serving closely related customers should share the same auth pattern, so that every user in the same workflow is unique allowing business logic and workflow to change flexibly without conflict.
+- The dicision of registration pattern should be set once for all. For internal services, invitation pattern is higher on the list. In this pattern the permission pattern can be simplfied to focus on the business workflow as the security can rely on the real world relationships. For open registration model, the assumption that the end user is an experienced hacker infiltrating our service must be made.
+
+Some useful technologies.
+
+- Passport.js
+- MongoDB/Mongoose
+- Express.js

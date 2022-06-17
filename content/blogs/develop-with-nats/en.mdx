@@ -1,0 +1,38 @@
+---
+title: 'Develop with NATS'
+---
+
+When developing backend services, it is usually a good idea to decouple the services by routing all the communications through a messaging layer.
+
+[NATS][nats] is a cross-language messaging layer. It officially supports clients written in Golang, TypeScript, Java, etc. The biggest difference compared to the traditional messaging service such as Kafka is that NATS delivers a _at-most-once_ strategy, meaning each message will be delivered to the subscribers at most once. The delivery is allowed to fail and the failure is expected to be handled by the applications.
+
+The _at-most-once_ design is somewhat resembling the PubSub system or the event emitter/listener system. A very useful feature NATS provides is the request-reply function, where the publisher awaits at least one subscriber to have replied.
+
+# Development Setup
+
+To develop services based on NATS, several common issues must be addressed.
+
+## Mock NATS Client
+
+Unit test is a necessity to build a robust service. A common practice is to mock all the actions that requires external resources during the unit test. NATS connection is one of the resources requiring mocking.
+
+[This repo][orig-mock] provides a mocked NATS client for JavaScript. There are some caveats tho: it is not shipped with types and it does not fully support the subscription options.
+
+Therefore I made [my own fork][mock] published as `@onichandame/mock-nats-client`. My fork is written in TypeScript and utilizes the original typing of NATS Client. As a result, the mocked functions have the same signatures as the original NATS Client.
+
+## Start NATS Server
+
+There are times when multiple clients instances must be able to communicate during testing. In which case a mocked client does not satisfy the demands so a real NATS server must be started. [This lib][nats-server] was created for this purpose. However, it does not run on Github Action or Windows.
+
+## Github Action
+
+To start a NATS server/cluster during testing on Github Action, I created [this action][nats-action] for bootstrapping NATS server/cluster in actions, and [this action][nats-client] to test if the server/cluster is up and running.
+
+# Authorization
+
+[nats]: https://nats.io/
+[orig-mock]: https://github.com/FrostDigital/mock-nats-client
+[mock]: https://github.com/onichandame/mock-nats-client
+[nats-server]: https://github.com/onichandame/nats-server
+[nats-action]: https://github.com/onichandame/nats-action/
+[nats-client]: https://github.com/onichandame/nats-client-action/

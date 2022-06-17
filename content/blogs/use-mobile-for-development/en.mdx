@@ -1,0 +1,37 @@
+---
+title: 'Use Mobile for Development'
+---
+
+There are many confindential files that cannot be saved everywhere, such as private ssh key and tls private key, etc. There are 2 solutions each focusing on different attributes:
+
+- **For convenience**: save all secrets on a remote machine and remove access the machine frome anywhere with a single password
+- **For security**: save all secrets on a local laptop and carry it everywhere
+
+Now with <a href={'../use-container-for-development'}>this solution</a> the convenient method can be deployed anywhere in one-click as long as docker is available. But for the secure method there is very little we can do to ease the load as a fully functional computer with a desktop OS is still irreplacible, mainly for the following reasons:
+
+1. Browsers with development tools(F12) are only found on desktop OS
+2. The ability to connect to an external screen
+
+Other problems such as a functional console has already been solved. This post records all the solved issues.
+
+# Development Environment
+
+A complete devlopment environment includes an IDE, neccessary toolchains and enough hardware resources to run the software. Mobile platform can provide non of these. The simplest option is to use mobile as a client and put all the heavy liftings to a remote powerful machine. The best deployment is to reserve a pod in a remote k8s cluster as the remote server, the mobile client then connects to the pod using ssh or kubectl.
+
+# User Interface
+
+The most common UI for development includes 2 parts: coding and testing. The coding part for me only requires a console while the testing part requires some GUI.
+
+## Coding Interface
+
+The best console on mobile(Android) is [termux][termux]. To install the most updated version one needs [F-Droid][fdroid] instead of Google Play. Termux is essentially a Debian-style interface with many common packages available through `apt`.
+
+As the development environment is in a remote machine, termux on the mobile only needs kubectl as the client, which is already in the official repository.
+
+## Testing Interface
+
+A testing interface requires at least a browser with devtools. Thus a laptop is still required at the current stage. Hence the mobile should allow the laptop to remote access it. Termux has openssh server available in its official repository, together with the [service][service], the ssh server will automatically start on the first launch.
+
+[termux]: https://termux.com/
+[fdroid]: https://www.f-droid.org/
+[service]: https://wiki.termux.com/wiki/Termux-services

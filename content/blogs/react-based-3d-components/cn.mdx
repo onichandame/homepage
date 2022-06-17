@@ -1,0 +1,176 @@
+---
+title: '基于React的3D组件化开发'
+---
+
+这是我在 3D/React 开发中的个人经验的记录。因项目仍在开发中，内容可能会随时修改。
+
+# 背景
+
+我需要设计实现一个 3 维的设施信息化模型（BIM）。这个 BIM 模块需要与现有的基于 Next.js 的前端融合起来。
+
+# 需求分析
+
+## 用户体验
+
+最终用户是对 IT 或 BIM 都不熟悉的工人，因此所有功能必须简洁明了。
+
+1. UI 和真实设施必须一眼就能联系起来
+2. 操作模式必须简单
+3. 所有文字和数字要尽量少且明了
+4. 一个相机重置按钮，一个场景重置按钮，每个组件都需要包含在一个虚拟按钮中，按下虚拟按钮会进入该组件的详情界面。
+
+## 技术限制
+
+1. 必须与 Next.js 融合
+2. 必须能加载 GLTF 或 OBJ 等通用 3 维模型
+3. 必须用 code-splitted 来尽量减小对原始网页的影响。
+
+# 技术分析
+
+基于以上需求，我研究了一些现有技术。很多框架都很有用，其中大部分都基于以下 3 种基础技术。
+
+## React 360
+
+这是 Facebook 为 VR 开发的一个 UI 框架，它默认支持 3 维且支持从 GLTF 和 OBJ 文件中读取模型。乍一看它会是最优选。
+
+1. 默认支持 3 维
+2. 默认支持互动
+3. 支持 GLTF 和 OBJ 模型
+
+但是它基于 React Native，因此很难将其融合进传统的网页。当然，可以使用`<iframe>`将其植入网页，但这种模式会极大提升部署流程的复杂度。而且它专注于 VR，并不是我真正想要的。最后，它的用户数量没有其它框架多，因此社区支持比其它框架少。
+
+## Babylon
+
+根据[官方文档](https://doc.babylonjs.com/resources/babylonjs_and_reactjs)，这个框架自带 React 支持。但是文档中也指出使用 React 的话会造成 performance 方面的问题。最佳方案是用纯 JavaScript 做开发。而我希望利用 React 的组件化能力。对此也有一些解决方案，如 React DOM 或 reconciler，但这些方面的社区非常小。[现有方案](https://github.com/brianzinn/react-babylonjs)在写下这句话时仅有 140 个赞。作为独立开发者，社区支持是我比较看重的方面。
+
+## 基于 Three 的解决方案
+
+接下来是主菜。Three.js 作为 web 业界最受欢迎的 3 维开发框架，它有最大的社区支持。但是它并未对 React 做适配，因此 React-Three 社区相对于 Three 社区来说还是比较小的。
+
+### [React-Three-Fiber][r3f]
+
+这是最合适的框架了。
+
+1. 与 React 高度融合，且没有明显的 performance 影响
+2. 能够加载 GLTF 模型
+3. 只是一个 Three.js 的 wrapper，因此 Three 社区的很大一部分资源都有用
+4. 创作者还开发了许多辅助工具，如 ray casting，动画等
+
+唯一不在此框架内的是 Next.js 的动态导入技术。这并不是因为框架本身有缺陷，而是因为一个 web 开发中 3 维开发的基础属性：2 维仅需要纯 HTML 即可，3 维需要加载外部的模型。如果需要在 React 组件中包含模型，则需要将组件在运行时使用`next/dynamic`动态导入。
+
+而且动态导入自带 code-splitting 效果。
+
+# 实现
+
+本节记录我在实现 BIM 时解决的主要问题。以下需要对 React 和 3 维开发有基本的了解。
+
+## 设计
+
+因为 BIM 是用来表示物理构件间的位置关系和构件的状态，应该尽量在一个屏幕上囊括所有构件。基于这个准则，所有构件都应该放置在一个平面上，因此镜头可以限制在一个平面上移动。
+
+![example](/image/bim-example.jpg)
+
+如上图所示，所有构件都在一个截屏上可见。构件的形状和位置信息由模型提供，构件的状态信息由模型的颜色提供。
+
+用户和 BIM 间的互动可以总结如下：
+
+1. 点击构件以进入构件的控制界面
+2. 将镜头位置重置为初始位置
+
+第一个互动可以用单击模型实现。
+
+第二个互动可以用单击重置按钮实现。
+
+## 加载模型
+
+首要的问题是加载设计师制作的模型。在<a href={'../collaboration-using-blender'}>此文</a>中，我实现了将 SolidWorks 模型转换成 Blender 模型。而 Blender 可以将模型输出冲 GLTF 格式。
+
+[R3F][r3f]提供了 hook `useLoader`用以和 three 的`GLTFLoader`一起加载 GLTF 模型。
+
+```typescript
+import { useLoader } from 'react-three-fiber'
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+
+export const Model = () => {
+  const gltf = useLoader(GLTFLoader, '/static/model.gblb')
+  return <primitive object={gltf.scene} dispose={null} {...other} />
+}
+```
+
+## 视界移动
+
+移动视界基本上有 2 种方法：移动镜头（第一人称）或移动模型（上帝视角）这两种方法对平移的效果都一样，因此将根据它们对旋转的不同效果做取舍。
+
+在无法将所有模型囊括的巨大场景种，第一人称更符合人的直觉。在全场景中，上帝视角是更好的选择。
+
+在 BIM 中，所有模型都应该在一个屏幕中显示，因此应该选择上帝视角。
+
+上帝视角可以用`react-use-gesture`的`useGesture`和`@react-spring/core`的`useSpring`实现。
+
+```typescript
+import { a } from '@react-spring/three'
+const useControl = (
+  ...[xBounds, yBounds, zBounds, { domTarget }]: Props
+): [
+  { x: SpringValue<number>; y: SpringValue<number>; z: SpringValue<number> },
+  ReturnType<typeof useGesture>
+] => {
+  const [{ x }, setX] = useSpring<{ x: number }>(() => ({
+    x: 0,
+    config: config.slow,
+  }))
+  const [{ y }, setY] = useSpring<{ y: number }>(() => ({
+    y: 5,
+    config: config.slow,
+  }))
+  const [{ z }, setZ] = useSpring<{ z: number }>(() => ({
+    z: 5,
+    config: config.slow,
+  }))
+  const zoom = useCallback(
+    ({ wheeling, xy: [, newY], previous: [, oldY], memo = z.get() }) => {
+      if (wheeling) {
+        const newZ = clamp(memo + newY - oldY, ...zBounds)
+        setZ({ z: newZ })
+        return newZ
+      } else {
+        return memo
+      }
+    },
+    [zBounds, z, setZ]
+  )
+  const drag = useCallback(
+    ({ dragging, offset: [newX, newY], memo = [x.get(), y.get()] }) => {
+      if (dragging) {
+        setX({ x: newX })
+        setY({ y: -newY })
+        return [newX, newY]
+      }
+      return memo
+    },
+    [xBounds, yBounds, x, y, setX, setY]
+  )
+  const bind = useGesture({ onWheel: zoom, onDrag: drag }, { domTarget })
+  useEffect(() => {
+    domTarget && bind()
+  }, [domTarget, bind])
+  return [{ x, y, z }, bind]
+}
+
+export const App = ({children}) => {
+  const bound: [number, number] = [-200, 200]
+  const [{ x, y, z }] = useControl(bound, bound, bound, { domTarget: window })
+  return (
+    <a.group
+      position-x={x.interpolate(x => (x / 500) * 10)}
+      position-y={y.interpolate(x => (x / 500) * 10)}
+      position-z={z.interpolate(x => (x / 500) * 25)}
+    >
+      {children}
+    </a.group>
+  )
+```
+
+上面输出的`App`可以将其 children 中的模型包裹在一个上帝视角中，平移和缩放都可以。
+
+[r3f]: https://www.npmjs.com/package/react-three-fiber

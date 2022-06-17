@@ -1,0 +1,15 @@
+---
+title: 'Git使用技巧'
+---
+
+Git 是一个完美且通用的工具，但是在它出现后十几年中也出现了一些新的挑战需要一一解决。此文记录这些问题和对应的解决方案。
+
+# 代理
+
+在中国，最醒目的障碍就是墙。有时候甚至 GitHub 都被封锁。在这种情况下，必须使用可以翻墙的代理来绕过障碍。根据[此文][git-proxy]，可以使用如下命令使 git 在连接特定域名时使用代理：
+
+```bash
+git config --global http.https://<domain.com.proxy> http://<proxyUsername:proxyPassword@proxy.server.com:port>
+```
+
+[git-proxy]: https://gist.github.com/evantoli/f8c23a37eb3558ab8765

@@ -1,0 +1,58 @@
+---
+title: 'Use Jest for Unit Test'
+---
+
+Unit test is a must for autiomated CI/CD workflow. Here I record some challenges solved with Jest.
+
+```typescript
+describe('module 1', () => {
+  test('dances', () => expect(module1.dance()).toBeTruthy())
+})
+```
+
+# Asynchronous Code
+
+Jest runs tests in parallel so each test must have a clear termination point. If everything is synchronous, simply return an expect function will tell Jest where to stop.
+
+The problem becomes apparent if the test callback is asynchronous.
+
+```typescript
+describe('module 1', () => {
+  test('dances', async () => expect(module1.dance()).toBeTruthy())
+})
+```
+
+The above code still functions well if `module1.dance()` is synchronous. What happens if the resolved value needs to be tested?
+
+```typescript
+describe('module 1', () => {
+  test('dances', async () => expect(await module1.dance()).toBeTruthy())
+})
+```
+
+The above is a simple solution to the simple question. What if the question becomes more complicated?
+
+```typescript
+describe('module 1', done => {
+  test('dances', async () => {
+    expect.assertions(1)
+    const dance = await module1.dance()
+    dance.on('spin', speed => {
+      expect(speed).toBeGreaterThan(5)
+      done()
+    })
+  })
+})
+```
+
+The above code is an example where the `done` function is useful. The test is considered finished when the `done` function is called inside the test. Another use case of `done` is the `beforeAll` hook.
+
+```typescript
+beforeAll(async done => {
+  await dep1
+  await dep2
+  done()
+})
+```
+
+Without the use of `done`, Jest will run the callback synchronously so the tests will start before `dep1` and `dep2` are resolved.

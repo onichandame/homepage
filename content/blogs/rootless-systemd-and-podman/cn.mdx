@@ -1,0 +1,57 @@
+---
+title: '非Root和使用Podman的systemd'
+---
+
+Systemd 是一个用于自动化管理日常任务的工具。我遇到了以下限制：
+
+1. 在启动时以非 root 用户的身份开启任务
+2. 在失败时自动重启
+
+解决方案是作为非 root 用户创建 systemd 服务。
+
+# 步骤
+
+## 创建服务
+
+```bash
+systemctl edit --user --full --force <service_name>
+```
+
+## 添加内容
+
+```text
+[Unit]
+Description=<Service>
+
+[Service]
+Restart=always
+ExecStart=<Servece_Start>
+ExecStop=<Service_Stop>
+
+[Install]
+WantedBy=default.target
+```
+
+最后一行在 auto-start 的依赖列表中注册此服务。
+
+## 启动服务
+
+```bash
+systemctl enable --user <service_name>
+```
+
+## （可选）启动 linger
+
+```bash
+ sudo loginctl enable-linger "$USER"
+```
+
+这一项设置允许在用户登出时继续运行服务。
+
+# Podman 服务
+
+将 podman 容器作为服务管理时，`ExecStart`命令应该是`podman start -a <container_name>`而`ExecStop`命令应该是`podman stop -t <seconds_to_wait> <container_name>`。详细信息参见<https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/running_containers_as_systemd_services_with_podman>
+
+# 感谢
+
+非常感谢[此 issue](https://github.com/systemd/systemd/issues/2690)

@@ -1,0 +1,58 @@
+---
+title: '使用Jest做单元测试'
+---
+
+自动化 CI/CD 工作流中，单元测试是必需项。这里我记录一些使用 Jest 时发现的难点。
+
+```typescript
+describe('module 1', () => {
+  test('dances', () => expect(module1.dance()).toBeTruthy())
+})
+```
+
+# 异步
+
+Jest 并行处理所有单元测试，因此每个测试都要提供一个明确的终止符。如果代码全是同步的，只需要从测试 callback 中返回一个 expect 即可通知 Jest 测试何时结束。
+
+问题出现在测试 callback 是异步时。
+
+```typescript
+describe('module 1', () => {
+  test('dances', async () => expect(module1.dance()).toBeTruthy())
+})
+```
+
+上面的测试代码在`module1.dance()`是同步时有效。但当 resolved value 需要测试时又如何？
+
+```typescript
+describe('module 1', () => {
+  test('dances', async () => expect(await module1.dance()).toBeTruthy())
+})
+```
+
+上面的测试代码是对简单问题的简单回答。但当问题变得更复杂时又如何？
+
+```typescript
+describe('module 1', done => {
+  test('dances', async () => {
+    expect.assertions(1)
+    const dance = await module1.dance()
+    dance.on('spin', speed => {
+      expect(speed).toBeGreaterThan(5)
+      done()
+    })
+  })
+})
+```
+
+上面的测试代码是体现`done`方法用处的案例。测试在`done`被呼叫时结束。另一个例子是在`beforeAll`中。
+
+```typescript
+beforeAll(async done => {
+  await dep1
+  await dep2
+  done()
+})
+```
+
+不适用`done`时，Jest 会同步式执行 callback，因此测试代码将在`dep1`和`dep2` resolved 之前开始。

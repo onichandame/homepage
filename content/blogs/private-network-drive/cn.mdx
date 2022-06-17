@@ -1,0 +1,30 @@
+---
+title: '私有网盘'
+---
+
+生活在互联网时代，对网盘的需求永远没有满足的一天。它有很多用途：
+
+- 储存手机上的视频和图片。手机的存储只应该用在应用上。
+- 储存应用和移动设备的备份。
+- 与朋友分享文件。
+- and more...
+
+有很多云服务旨在解决这些问题，但是它们在容量、长时间可靠性和性价比方面都很差。使用私有云是更好的解决方案。
+
+# WebDav
+
+[WebDav][webdav]是一个基于 HTTP 的文件服务协议。它基本上将文件的 CRUD 操作和 HTTP 的 POST/GET/PUT/DELETE 请求一一对应。[WebDav][webdav]提供所有 HTTP 支持的功能，包含基本权限管理（账号密码）和 TLS 加密。
+
+我个人使用基本的权限管理保护我的私人网盘。如需与他人分享，则需要更复杂的权限设计，这里不讨论。
+
+为搭建一个 WebDav 服务器，可以使用容器。[这个镜像][container]提供基本的权限管理。
+
+为在 Windows 上使用 WebDav，需要使用网络硬盘功能。但是会导致一个权限问题，[这个 post][windows]可以解决这个问题。
+
+1. 确保`WebClient`服务在线
+2. 编辑注册表中的`HKEY_LOCAL_MACHINE > SYSTEM > CurrentControlSet > Services > WebClient> Parameters`，保证`BasicAuthLevel`的值为 2
+3. 重启 Windows
+
+[webdav]: https://en.wikipedia.org/wiki/WebDAV
+[container]: https://github.com/sashgorokhov/docker-nginx-webdav
+[windows]: https://support.netdocuments.com/hc/en-us/articles/205212850-WebDAV-as-a-Mapped-Drive

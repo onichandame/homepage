@@ -1,0 +1,96 @@
+---
+title: 'Connect with IPFS'
+---
+
+[IPFS][ipfs] is designed to lay the foundation of the next-generation web, in hope of replacing the old HTTP-based web. It's potential is more than it's design though.
+
+Built on top of the p2p network connected by [libp2p][libp2p], on which IPFS is based, many fancy applications becomes possible.
+
+The comman setup for all nodes are below:
+
+```bash
+ipfs config --json Experimental.Libp2pStreamMounting true
+ipfs config --json Swarm.EnableAutoRelay 'true'
+```
+
+The first command allows to open long-running connections between nodes. The second command enables the automatic detection and usage of relay servers.
+
+# Windows Setup
+
+Before diving into the applications, some precautions are required when a node resides on a Windows machine.
+
+## WSL 2
+
+The latest version of WSL 2 is a blazing fast Linux environment on Windows machines. It is recommended to run applications in WSL 2 if possible. Hence I run a go-ipfs instance in WSL 2 and use it as a server for many cases.
+
+## Restart on Reboot
+
+A common requirement for a server is to restart the services on system reboot. This can be achieved using Windows Task Scheduler.
+
+The following services should be restarted on reboot:
+
+1. the IPFS node: `ipfs daemon`
+2. the sshd instance: `/usr/sbin/sshd` (if used as an SSH server)
+
+The port forward services described below may also be managed by Task Scheduler.
+
+# Connection Setup
+
+Most of the existing applications are based on address-based routing. But IPFS is mostly used for content-based routing. This difference makes many trivial applications troublesome.
+
+To connect 2 IPFS nodes, one needs to initiate the connection from one node(client) to another(server).
+
+The command to connect 2 nodes is:
+
+```bash
+ipfs ping <Server ID>
+ipfs swarm connect /p2p/<Server ID>
+```
+
+In the cases when the direct connection is not successful, one simply needs to ping the server.
+
+# SSH Across NAT
+
+[SSH][ssh] is a remote login tool based on a TCP connection. IPFS has [an experimental feature][tunnel] that is able to set up a TCP connection between two nodes regardless of the traditional network topology. That being said, it can connect machines behind impenetrable NAT.
+
+## Server Setup
+
+The server needs to listen on connections and forward the stream to the sshd instance.
+
+```bash
+ipfs p2p listen /x/ssh /ip4/127.0.0.1/tcp/22
+```
+
+## Client Setup
+
+On the client side things are similar. I have made [a docker image][client] for the client setup. The Dockerfile can be found [here][clientdf]. This image can also be used as the server. The only manual step required is to run `/usr/sbin/sshd`.
+
+# Proxy
+
+A common scenario is to run a web service on a server and access the server from a client. The protocol is usually based on TCP. To proxy TCP connections, the following setup is required.
+
+## Server
+
+The server needs to listen on a port.
+
+```bash
+ipfs p2p listen /x/kickass/1.0 /ip4/127.0.0.1/tcp/<Server port>
+```
+
+## Client
+
+The client needs to proxy the port exposed by the server to a local port.
+
+```bash
+ipfs p2p forward /x/kickass/1.0 /ip4/0.0.0.0/tcp/<Local port> /p2p/<Server port>
+```
+
+Now the web service on the server can be accessed from the _Local port_.
+
+[ipfs]: https://ipfs.io/
+[libp2p]: https://github.com/libp2p/specs
+[ssh]: https://en.wikipedia.org/wiki/Ssh_(Secure_Shell)
+[tunnel]: https://github.com/ipfs/go-ipfs/blob/master/docs/experimental-features.md#ipfs-p2p
+[clientdf]: https://github.com/onichandame/docker-ipfs/blob/ssh/Dockerfile
+[client]: https://hub.docker.com/layers/onichandame/ipfs/ssh/images/sha256-7bbfb56ab201408539b6735409f5a6d737609bc06f8461a2d568cb3495203ce9?context=explore
+[nat]: https://docs.libp2p.io/concepts/nat/

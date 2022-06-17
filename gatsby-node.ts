@@ -12,18 +12,37 @@ export const onCreateNode: GatsbyNode['onCreateNode'] = ({
   getNode,
 }) => {
   const { createNodeField } = actions
-  if (node.internal.type === `Mdx`) {
-    const { name, relativeDirectory, sourceInstanceName } = getNode(node.parent)
-    createNodeField({
-      node,
-      name: 'sourceInstanceName',
-      value: sourceInstanceName,
-    })
-    switch (sourceInstanceName) {
-      case `posts`:
-        createNodeField({ node, name: 'locale', value: name })
-        createNodeField({ node, name: 'name', value: relativeDirectory })
-        break
+  switch (node.internal.type) {
+    case `Mdx`: {
+      const { name, relativeDirectory, sourceInstanceName } = getNode(
+        node.parent
+      )
+      createNodeField({
+        node,
+        name: 'sourceInstanceName',
+        value: sourceInstanceName,
+      })
+      switch (sourceInstanceName) {
+        case `blogs`:
+          createNodeField({ node, name: 'locale', value: name })
+          createNodeField({ node, name: 'name', value: relativeDirectory })
+          break
+      }
+      break
+    }
+    case `Yaml`: {
+      const { relativeDirectory, sourceInstanceName } = getNode(node.parent)
+      createNodeField({
+        node,
+        name: 'sourceInstanceName',
+        value: sourceInstanceName,
+      })
+      switch (sourceInstanceName) {
+        case `blogs`:
+          createNodeField({ node, name: 'name', value: relativeDirectory })
+          break
+      }
+      break
     }
   }
 }
@@ -32,7 +51,7 @@ export const createPages: GatsbyNode['createPages'] = async ({
   graphql,
   actions,
 }) => {
-  const blogTemplate = path.resolve('./src/components/blog/detail.tsx')
+  const blogTemplate = path.resolve('./src/templates/blog/index.tsx')
   const { createPage } = actions
   const blogs = await graphql<{
     blogs: {
@@ -51,7 +70,7 @@ export const createPages: GatsbyNode['createPages'] = async ({
     #graphql
     {
       blogs: allMdx(
-        filter: { fields: { sourceInstanceName: { eq: "posts" } } }
+        filter: { fields: { sourceInstanceName: { eq: "blogs" } } }
       ) {
         edges {
           node {

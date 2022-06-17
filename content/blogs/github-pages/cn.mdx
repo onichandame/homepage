@@ -1,0 +1,53 @@
+---
+title: 'Github Pages'
+---
+
+我的许多个人项目是前端库，这些项目都应该提供一个 demo 网站，以便使用者能无需 clone 和 build 就能直观看到最终效果。但是，网站托管的价格还没有便宜到任意项目都能用的地步。
+
+[Github Pages(Pages)][pages]提供一个免费的解决方案。此处我记录一些使用 Pages 过程中发现的技巧。
+
+# Github Actions
+
+[The guide][pages]提供了完整的发布教程，但没有提供标准化的开发工作流。
+
+[Github Actions(Actions)][actions]是一个好用的自动化 CI/CD 工具。用这个工具可以让开发工作和网站生成自动保持同步。
+
+网站源文件默认存储在`gh-pages`分支中。感谢[这个 action][push]，整个过程可以自动化。
+
+```yaml
+ghpage-publish:
+  name: ghpage-publish
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@master
+    - name: Set up Node.js
+      uses: actions/setup-node@master
+      with:
+        node-version: 14.x
+    - name: Set up dependency
+      run: yarn install --frozen-lockfile
+    - name: Build pages
+      run: yarn build:docs
+    - name: Publish
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: docs
+```
+
+以上 action 假设项目基于 Node.js，且使用`yarn`作为管理工具，且配置了`build:docs`作为 build 网站到/docs 目录的脚本。当这个 action 成功的时候，`gh-pages`分支中就有了最新版的网站。
+
+唯一不好的点是`gh-page`必须手动创建，否则发布指令永远不会触发。这可能是 Pages 的一个 bug 导致的，但我没找到相关的 issue。另一个解决方法是用`curl -X POST -i -u "<username>" https://api.github.com/repos/<username>/<reponame>/pages/builds`手动触发发布指令。感谢[官方指南][api]。
+
+# 个人主页
+
+Pages 不仅提供项目网站的托管，还提供用户网站的托管。每个 github 用户都能托管一个用户网站。源文件储存在`<username>.github.io`仓库中。
+
+分支`master`有网站源文件。但很多时候网站都是用其它源文件中生成的，比如 React。此时就需要在另一个分支如`source`中保存源文件。可以用 Actions 自动化 build 和 publish 工作。
+
+[pages]: https://pages.github.com/
+[actions]: https://github.com/actions
+[push]: https://github.com/JamesIves/github-pages-deploy-action
+[api]: https://developer.github.com/v3/repos/pages/

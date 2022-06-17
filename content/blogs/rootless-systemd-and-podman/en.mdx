@@ -1,0 +1,57 @@
+---
+title: 'Rootless systemd and Podman'
+---
+
+Systemd is a useful tool programmatically managing routine tasks. I encountered a specific situation with some constraints:
+
+1. start task on boot as a non-root user
+2. auto restart on failure
+
+The solution to this issue is to create a systemd task as the non-root user.
+
+# Steps
+
+## Create the service
+
+```bash
+systemctl edit --user --full --force <service_name>
+```
+
+## add the content
+
+```text
+[Unit]
+Description=<Service>
+
+[Service]
+Restart=always
+ExecStart=<Servece_Start>
+ExecStop=<Service_Stop>
+
+[Install]
+WantedBy=default.target
+```
+
+the last line registers the service to the dependency list for auto-start
+
+## enable the service
+
+```bash
+systemctl enable --user <service_name>
+```
+
+## (optional) enable linger
+
+```bash
+ sudo loginctl enable-linger "$USER"
+```
+
+This is to allow the service continuing to run after the user is logged out.
+
+# Podman Service
+
+When running podman container as a systemd service, the `ExecStart` command should be `podman start -a <container_name>` and the `ExecStop` command should be `podman stop -t <seconds_to_wait> <container_name>`. Details can be found at <https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux_atomic_host/7/html/managing_containers/running_containers_as_systemd_services_with_podman>
+
+# Credits
+
+Thanks to [this issue](https://github.com/systemd/systemd/issues/2690)
