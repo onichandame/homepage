@@ -204,9 +204,9 @@ Powershell:
 
 ```powershell
 function vim {
-  $filepath=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($args[0])
-  $parent=Split-Path -Path $filepath
-  $filename=Split-Path -Path $filepath -Leaf
+  $filepath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($args[0])
+  $parent = Split-Path -Path $filepath
+  $filename = Split-Path -Path $filepath -Leaf
   invoke-expression "docker run -it --rm -e SSHD_DISABLED=true -e DIND_DISABLED=true -v ${parent}:/parent -w /parent <image name> vim $filename"
 }
 ```

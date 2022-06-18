@@ -33,6 +33,7 @@ export default {
       resolve: `gatsby-plugin-react-i18next`,
       options: {
         localeJsonSourceName: `locale`, // name given to `gatsby-source-filesystem` plugin.
+        siteUrl: `https://onichandame.com`,
         languages: [`en`, `cn`],
         defaultLanguage: `en`,
         // you can pass any i18next options

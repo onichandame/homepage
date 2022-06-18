@@ -1,6 +1,8 @@
-import { Grid, Typography } from '@mui/material'
+import { Box, Grid, Typography } from '@mui/material'
 import { graphql, PageProps } from 'gatsby'
 import { MDXRenderer } from 'gatsby-plugin-mdx'
+import { MDXProvider } from '@mdx-js/react'
+import { CopyBlock, nord } from 'react-code-blocks'
 
 export default ({
   data,
@@ -10,29 +12,69 @@ export default ({
       title: string
     }
     body: string
+    timeToRead: number
   }
   metadata: {
     updatedAt: Date
-    hidden?: boolean
     featured?: boolean
   }
 }>) => {
   return (
-    <Grid container direction={'column'} alignItems="stretch">
+    <Grid container direction={'column'} alignItems="center">
       <Grid item>
-        <Typography variant={'h3'}>{data.blog.frontmatter.title}</Typography>
-      </Grid>
-      <Grid item>
-        <Grid container justifyContent="end" direction="row">
-          <Grid item>
-            <Typography variant={'caption'}>
-              {new Date(data.metadata.updatedAt).toLocaleString()}
-            </Typography>
-          </Grid>
-        </Grid>
+        <Typography variant={'h3'} sx={{ whiteSpace: `pre-wrap` }}>
+          {data.blog.frontmatter.title}
+        </Typography>
       </Grid>
       <Grid item sx={{ padding: theme => theme.spacing(2) }}>
-        <MDXRenderer>{data.blog.body}</MDXRenderer>
+        <Grid container direction="row" justifyContent="center">
+          <Grid item lg={8} xs={12}>
+            <Grid container direction="column">
+              <Grid item>
+                <Grid container justifyContent="space-between" direction="row">
+                  <Grid item>
+                    <Typography variant="caption">
+                      {data.blog.timeToRead}min
+                    </Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography variant={'caption'}>
+                      {new Date(data.metadata.updatedAt).toLocaleDateString()}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item>
+                <MDXProvider
+                  components={{
+                    pre: ({ children }) => (
+                      <Box
+                        component="pre"
+                        sx={{ maxWidth: `100%`, overflowX: `auto` }}
+                      >
+                        {children}
+                      </Box>
+                    ),
+                    code: ({ children, className }) => (
+                      <CopyBlock
+                        text={children}
+                        language={
+                          className?.split(`language-`)[1]?.split(` `).pop() ||
+                          `text`
+                        }
+                        showLineNumbers
+                        wrapLongLines
+                        theme={nord}
+                      />
+                    ),
+                  }}
+                >
+                  <MDXRenderer>{data.blog.body}</MDXRenderer>
+                </MDXProvider>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   )
@@ -60,14 +102,13 @@ export const query = graphql`
         title
       }
       body
+      timeToRead
     }
     metadata: yaml(
       hidden: { ne: true }
-      featured: { eq: true }
       fields: { sourceInstanceName: { eq: "blogs" }, name: { eq: $name } }
     ) {
       updatedAt
-      hidden
       featured
     }
   }

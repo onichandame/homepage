@@ -69,7 +69,7 @@ export default ({
           </Grid>
           <Divider flexItem />
           <Grid item>
-            <Grid container direction="row" spacing={5}>
+            <Grid container direction="row" spacing={5} justifyContent="center">
               {normalBlogs.map(blog => (
                 <Grid
                   item
