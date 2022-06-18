@@ -2,31 +2,49 @@
 title: '用容器开发'
 ---
 
+tl;dr: 我的开发环境全在这个[docker 镜像][src]中
+
+# 背景
+
 作为一个全职开发者，我经常需要在办公室和家里交替办公。由此导致了一个问题：如何同步家里和办公室里的开发环境？
 
-# 一些思考
+最佳的效果是只需要配置一次开发环境，而且部署起来轻量简单，在遇到问题时可以很容易地用重置来解决。
 
-最基本的想法是自动化开发环境的配置。作为半个 DevOps，脚本是我最信赖的工具。
+# 思考及设计
 
-但是脚本在不同的 OS 中有不同的写法。因此我必须针对不同的 OS 编写不同的脚本。这个方法不能保证不同 OS 上的脚本能同步更新。因此脚本在这个问题中用处不大。
+最老土的办法是用脚本自动化所有人工配置的步骤。但是在不同平台上的脚本很难统一维护。
 
-这就是容器有用的地方了。因工作需要，我对容器有一定的了解。容器的以下特性有助于解决此问题：
+这就是容器有用的地方了，因工作需要，我对容器有一定的了解。容器的以下特性有助于解决此问题：
 
-1. 抽象了一个统一的 OS，因此我只需要考虑 1 个 OS。
-2. 与宿主机共享文件很方便
-3. 在所有主流 OS 上都能运行
+1. 只需要考虑 1 个平台。
+1. 在所有主流操作系统上都能运行
+1. 重启很简单
 
-# 挑战
+## IDE
 
-使用容器做开发并不简单。首先我需要用`-it`选项进入容器的 TTY 界面。然后用`-v`选项将开发文件永久存储在宿主机上。最后用`-p`选项将容器的端口映射到宿主机上。除了这些常见的步骤，一些不常见的问题也需要解决。
+第一个难点是 IDE。vscode 是桌面应用，而容器对 GUI 的支持很弱，因此我选择 Neovim。在 Linux 平台上我最熟悉的编辑器就是 vim 系列，选择 Neovim 而非 Vim 8 的理由是它由社区维护。
 
-以下需要对 Linux 配置和命令有基本的了解。
+Neovim 现在提供内置的 LSP 支持，只需要从网上搜寻一些配置即可。我的配置在[这里][src]
 
-## Podman
+## 部署
+
+更重要的问题是如何使用准备好的容器镜像。不能简单地用`docker run --rm -it onichandame/dev bash`启动一个容器然后就直接开始开发，因为容器的数据没有持久化，重启就丢了。最简单粗暴的方案就是挂载宿主机的路径，但是我必须考虑在不同地点做开发，办公室的宿主机只能在办公室范围内提供服务。
+
+答案是 Kubernetes(k8s)。一旦决定采用 k8s 问题就变得简单了，因此我不会提供所有细节。简单来说，我将容器部署在公网上的集群，因此在任何地点只要本地有 kubectl 都能直接使用。小提示：考虑 statefulset + ingress。
+
+# 其它尝试
+
+在确定最终方案之前，我尝试过很多其它路子，也学到了很多教训。
+
+## 本地容器
+
+在发现 k8s 之前，我试过在不同平台本地跑容器。
+
+### Podman
 
 Podman 是一个无 daemon 的容器运行环境。为绕过 SELinux 对硬盘读写的限制，需要使用`--security-opt label=disable`选项。
 
-Podman 和 Docker 对容器有不同的定义。Podman 不会为每个容器分配一个新 IP，因为分配新 IP 需要 root 权限。为联通两个非 root 容器，需要使用一个 pod 将两个容器包裹起来。[官方文档][pod]提供创造容器和 pod 的具体方法。[官方文档][pod-com]提供同一 pod 内不同容器的通信方法。但是，新建 pod 需要从 k8s.gcr.io 拉取镜像，在国内由于 GFW 这不可能。因此必须用一个国内镜像。
+Podman 和 Docker 对容器有不同的定义。Podman 不会为每个容器分配一个新 IP，因为分配新 IP 需要 root 权限。为联通两个非 root 容器，需要使用一个 pod 将两个容器包裹起来。[官方文档][pod]提供创造容器和 pod 的具体方法。[官方文档][pod-com]提供同一 pod 内不同容器的通信方法。但是，新建 pod 需要从 k8s.gcr.io 拉取镜像，在国内由于墙这不可能。因此必须用一个国内镜像。
 
 `man container-registries.conf`告诉我镜像的配置在`/etc/containers/registries.conf`文件中。这个路径在不同的发行版上可能不一样。在 CentOS 8 提供的默认配置中使用的是 v1 版本。但是镜像配置只在 v2 版本中可用，因此必须将配置转换为 v2 版本：
 
@@ -48,8 +66,90 @@ location="registry.cn-hangzhou.aliyuncs.com/google_containers"
 在 pod 内的容器无法直接与 host 通过 port mapping 通信，因此必须在创建 pod 时就将 port mapping 设置好。
 
 ```bash
-podman pod create -p 30000:3000
+podman pod create -p 3000:3000
 ```
+
+### 本地 Kubernetes
+
+在拥有公网集群之前，我只能先用本地 k8s 集群。
+
+#### Minikube
+
+官方推荐使用[minikube][minikube]配置开发环境。但它严重依赖虚拟机技术，因此相对于其它选择，minikube 需要消耗更多资源。
+
+#### Kind
+
+[kind][kind]在本地容器中启动一个 k8s 集群。它提供一个可执行程序用以管理集群，可以根据官方文档的指示进行安装。
+
+下一步是安装 ingress 控制器。基于我的经验，将服务与端口一一对应非常不便于管理。而将不同服务由同一个端口的不同域名对应则更方便。
+
+基于[官方文档][kind-ingress]，有 3 种控制器可选：Ambassador, Contour 和 Nginx。基于我的实验结果，仅 ambassador 在中国可用。要安装 ambassador 控制器，执行以下命令。
+
+```bash
+kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
+kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
+```
+
+在命名空间`ambassador`中的所有 pod 都上线后，控制器即为可用状态。
+
+一个需要注意的点是，所有需要使用 ambassador 的 ingress 都需要标注为`kubernetes.io/ingress.class: ambassador`。
+
+要安装其它 ingress controller，管理员需要确保 gateway 安装在 extra port mapping 规则所在的 node 上。
+
+因为 Istio 提供许多有关监控的功能，我选择使用 Istio。
+
+1. 运行`curl -L https://istio.io/downloadIstio | sh -`下载 Istio 的 CLI 客户端
+2. 运行`istioctl install -f istio.yaml`，*istio.yaml*可[从此下载](https://github.com/onichandame/docker-dev/blob/master/kube/istio.yaml)。
+
+现在 Istio default 已经安装完成。
+
+最后一个手动步骤是将 namespace 标记上`istio-injection=enabled`，用以通知 Istio 向该 namespace 的每一个 pod 注入 Sidecar。这个步骤是大部分 Istio 核心功能的前提。
+
+一个尚未完全解决的问题是当宿主机重启后，coredns 服务可能停止解析域名。一个临时的解决办法是在宿主机重启后手动重启 coredns 服务。
+
+```bash
+kubectl rollout restart deploy/coredns -n kube-system
+```
+
+#### K3D
+
+[K3d][k3d]是[Rancher][rancher]的一个产品，它基于一个超轻量的 kubernetes 发布版：[k3s][k3s]。因此其适合在低资源消耗的场景中应用，如 IoT 和本地测试环境等。就像[Kind][kind]一样，[K3d][k3d]利用容器技术模拟多 node 集群，但消耗更少的资源。
+
+[K3d][k3d]依靠命令行参数实现个性化配置。我使用如下的命令：
+
+```bash
+k3d cluster create --no-lb --k3s-server-arg='--disable=traefik' -p 80:30001@agent[0] -p 443:30002@agent[0] -a 3 -v <path to workspace on host>:/git -v <path to registries configuration file>:/etc/rancher/k3s/registries.yaml dev
+```
+
+外部负载均衡和 traefik 都被禁用，因为我希望使用 istio 来代替。端口映射的参数也是为 istio 安装做准备。参数`-a 3`指定需要 3 个 worker node。volume mount 参数将宿主机的工作区加载到所有 node 上，以提供稳定的数据存储。加载到`/etc/rancher/k3s/registries.yaml`的配置文件将官方源如 docker.io 和 gcr.io 替换为镜像源以提升拉取镜像的速度。
+
+istio 的安装方法如上所示。
+
+### Docker Desktop
+
+Docker 最初是为 Linux 设计的，因此在 Windows 上运行 Docker 总会出问题。本节我记录了所有在 Windows 10 上遇到的问题及其解决方案。
+
+#### Docker Engine
+
+Docker Desktop 可以基于 2 个引擎：HyperV（旧引擎）和 WSL 2。
+
+HyperV 就是一个传统的 VM hypervisor，Docker 用它建立一个跑 docker 后台的虚拟机。
+
+而 WSL 2 是一个深度集成的 Linux 内核，它比其它方案更快。因此我选择使用它。
+
+第一步是安装 WSL 2，点击[此处][wsl]获取官方教程。
+
+安装完毕 WSL 2 后，勾选 Docker Desktop 的 General settings 中的**Use the WSL 2 based engine**选项，然后重启 docker 后台让更改生效。**注意：重启后台后旧后台上的所有镜像都会删除！**
+
+当前版本的 WSL 2 有一个恶性 bug。如果你启动一个基于 WSL 2 的 Linux 发行版时，显示错误信息**the attempted operation is not supported for the type of object referenced.**，这意味着 WinSock 导致 WSL 2 崩溃了。基于[此问题][winsock]，以管理员模式运行`netsh winsock reset`可以永久解决这个问题。
+
+#### HyperV
+
+无论选择使用 HyperV 还是 WSL 2，HyperV 服务都必须被启用。但是微软做了个非常蠢的设定，在 HyperV 被启用后，BIOS 里的虚拟化会被关掉。因此在每次启用 HyperV 后，都必须手动进入 BIOS 启用虚拟化。
+
+感谢[此问题][hyperv]
+
+# 其它
 
 ## 防止容器关闭
 
@@ -76,7 +176,7 @@ podman pod create -p 30000:3000
 
 文件数量限制由一个硬限制和一个软限制组成。当超过软限制时，用户会收到警告；当硬限制被突破时，系统会报错。因此两种限制都需要提升。
 
-我的解决方案是提升宿主机的 NOFILE 限制，容器会自动继承宿主机的配置。详细步骤在<a to={'../ulimit'}>此文</a>中。
+我的解决方案是提升宿主机的 NOFILE 限制，容器会自动继承宿主机的配置。详细步骤在<a href={'./ulimit'}>此文</a>中。
 
 ## UTF-8 编码
 
@@ -85,30 +185,6 @@ podman pod create -p 30000:3000
 解决的第一步是在容器中添加特殊字符支持。我需要添加简中，因此我安装了`glibc-langpack-zh`。运行`locale -a`以检查是否安装成功。
 
 最后一步是选择默认编码。我在 bashrc 中添加了`export LANG="zh_CN.UTF-8"`和`export LC_ALL="zh_CN.UTF-8"`。
-
-## Windows 10
-
-Docker 最初是为 Linux 设计的，因此在 Windows 上运行 Docker 总会出问题。本节我记录了所有在 Windows 10 上遇到的问题及其解决方案。
-
-### Docker 引擎
-
-当写下这一句时，Docker Desktop 主要提供 2 个引擎：HyperV（旧引擎）和 WSL 2。
-
-HyperV 就是一个传统的 VM hypervisor，Docker 用它建立一个跑 docker 后台的虚拟机。
-
-而 WSL 2 是一个深度集成的 Linux 内核，它比其它方案更快。因此我选择使用它。
-
-第一步是安装 WSL 2，点击[此处][wsl]获取官方教程。
-
-安装完毕 WSL 2 后，勾选 Docker Desktop 的 General settings 中的**Use the WSL 2 based engine**选项，然后重启 docker 后台让更改生效。**注意：重启后台后旧后台上的所有镜像都会删除！**
-
-当前版本的 WSL 2 有一个恶性 bug。如果你启动一个基于 WSL 2 的 Linux 发行版时，显示错误信息**the attempted operation is not supported for the type of object referenced.**，这意味着 WinSock 导致 WSL 2 崩溃了。基于[此问题][winsock]，以管理员模式运行`netsh winsock reset`可以永久解决这个问题。
-
-### HyperV
-
-无论选择使用 HyperV 还是 WSL 2，HyperV 服务都必须被启用。但是微软做了个非常蠢的设定，在 HyperV 被启用后，BIOS 里的虚拟化会被关掉。因此在每次启用 HyperV 后，都必须手动进入 BIOS 启用虚拟化。
-
-感谢[此问题][hyperv]
 
 ## Kubernetes
 
@@ -123,69 +199,6 @@ docker run -it --rm -v <path to kubeconfig directory>:/root/.kube onichandame/do
 
 使用 kunernetes 作为开发环境，很多事情都要重新考虑。
 
-### 集群搭建
-
-安装 kubernetes 集群并不像 Docker Desktop 那样简单。官方推荐使用[minikube][minikube]配置开发环境。但它严重依赖虚拟机技术，因此相对于其它选择，minikube 需要消耗更多资源。[Kind][kind]和[k3d][k3d]都是利用容器技术代替虚拟机的选择。
-
-#### Kind
-
-[kind][kind]提供一个可执行程序用以管理集群，可以根据官方文档的指示进行安装。
-
-身处中国大陆，如 gcr registry 之类的谷歌服务都不可用。因此必须使用镜像 registry 来绕过限制。[kind][kind]可以从 yaml 文件中获取设置，就像 k8s 从 yaml 文件获取 deployment 配置一样。为此，我创建了[一个配置文件](https://github.com/onichandame/docker-dev/blob/master/kube/cluster.yaml)。
-
-有一个需要注意的点是`nodes.role.extraMounts`负责将宿主机上的一个路径映射至 worker node 上。如果不需要 persistent storage 可以将其删除。
-
-将配置文件保存在 cluster.yaml 内，就可以用以下命令启动集群：
-
-```bash
-kind create cluster --config git/kube/cluster.yaml
-```
-
-下一步是安装 ingress 控制器。基于我的经验，将服务与端口一一对应非常不便于管理。而将不同服务由同一个端口的不同域名对应则更方便。
-
-基于[官方文档][kind-ingress]，有 3 种控制器可选：Ambassador, Contour 和 Nginx。基于我的实验结果，仅 ambassador 在中国可用。要安装 ambassador 控制器，执行以下命令。
-
-```bash
-kubectl apply -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-crds.yaml
-kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/releases/latest/download/ambassador-operator-kind.yaml
-```
-
-在命名空间`ambassador`中的所有 pod 都上线后，控制器即为可用状态。
-
-一个需要注意的点是，所有需要使用 ambassador 的 ingress 都需要标注为`kubernetes.io/ingress.class: ambassador`，以通知 ambassador 控制器暴露这个 ingress。
-
-要安装其它 ingress controller，管理员需要确保 gateway 安装在 extra port mapping 规则所在的 node 上。
-
-I choose to install Istio as it provides many more useful features relating to the monitoring stuff.
-因为 Istio 提供许多有关监控的功能，我选择使用 Istio。
-
-1. 运行`curl -L https://istio.io/downloadIstio | sh -`下载 Istio 的 CLI 客户端
-2. 运行`istioctl install -f istio.yaml`，*istio.yaml*可[从此下载](https://github.com/onichandame/docker-dev/blob/master/kube/istio.yaml)。
-
-现在 Istio default 已经安装完成。
-
-最后一个手动步骤是将 namespace 标记上`istio-injection=enabled`，用以通知 Istio 向该 namespace 的每一个 pod 注入 Sidecar。这个步骤是大部分 Istio 核心功能的前提。
-
-一个尚未完全解决的问题是当宿主机重启后，coredns 服务可能停止解析域名。一个临时的解决办法是在宿主机重启后手动重启 coredns 服务。
-
-```bash
-kubectl rollout restart deploy/coredns -n kube-system
-```
-
-#### K3D
-
-[K3d][k3d0]是一个[Rancher][rancher]产品，它基于一个超轻量的 kubernetes 发布版：[k3s][k3s]。因此其适合在低资源消耗的场景中应用，如 IoT 和本地测试环境等。就像[Kind][kind]一样，[k3d][k3d]利用容器技术模拟多 node 集群，但消耗更少的资源。
-
-[K3d][k3d]依靠命令行参数实现个性化配置。我使用如下的命令：
-
-```bash
-k3d cluster create --no-lb --k3s-server-arg='--disable=traefik' -p 80:30001@agent[0] -p 443:30002@agent[0] -a 3 -v <path to workspace on host>:/git -v <path to registries configuration file>:/etc/rancher/k3s/registries.yaml dev
-```
-
-外部负载均衡和 traefik 都被禁用，因为我希望使用 istio 来代替。端口映射的参数也是为 istio 安装做准备。参数`-a 3`指定需要 3 个 worker node。volume mount 参数将宿主机的工作区加载到所有 node 上，以提供稳定的数据存储。加载到`/etc/rancher/k3s/registries.yaml`的配置文件将官方源如 docker.io 和 gcr.io 替换为镜像源以提升拉取镜像的速度。
-
-istio 的安装方法如上所示。
-
 ## 端口映射
 
 为从宿主机访问容器中的服务器，最好将容器的端口映射到宿主机上。所需的命令仅仅是在创建容器时加入`-p <host port>:<container port>`。但是，端口映射的配置在容器创建后不能修改，因此容器中的服务器必须侦听同一个端口。但不同的项目有不同的配置，不能强行让项目的配置配合本地的容器配置。
@@ -197,37 +210,7 @@ istio 的安装方法如上所示。
 socat TCP4-LISTEN:<mapped port>,fork,reuseaddr TCP4:localhost:<server port>
 ```
 
-## Vim in Docker
-
-在许多情况下，部署一个完整的集群不可行。但又需要用提前配置好的镜像中的 vim，最佳的方案是将要编辑的文件加载进容器中然后在容器中编辑文件。在不同的平台上的配置也不同。
-
-Powershell:
-
-```powershell
-function vim {
-  $filepath=$ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($args[0])
-  $parent=Split-Path -Path $filepath
-  $filename=Split-Path -Path $filepath -Leaf
-  invoke-expression "docker run -it --rm -e SSHD_DISABLED=true -e DIND_DISABLED=true -v ${parent}:/parent -w /parent <image name> vim $filename"
-}
-```
-
-# 实现
-
-源项目的结构如下所示：
-
-![struc](/image/container-development-structure.png)
-
-Dockerfile 是构建最终镜像的指令。
-
-files 目录下包含所有必须的配置文件，如 bashrc 和 vimrc 等。
-
-[点此][src]获取源文件
-
-[点此][hub]获取镜像
-
 [src]: https://github.com/onichandame/docker-dev/
-[hub]: https://hub.docker.com/repository/docker/onichandame/docker-dev
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/wsl2-install
 [winsock]: https://github.com/microsoft/WSL/issues/4177
 [hyperv]: https://answers.microsoft.com/en-us/windows/forum/all/resolving-wslregisterdistribution-error-0x80370102/412cf42b-1424-444c-bb95-4aa2b5fe5eaf
@@ -240,4 +223,3 @@ files 目录下包含所有必须的配置文件，如 bashrc 和 vimrc 等。
 [k3d]: https://github.com/rancher/k3d/
 [rancher]: http://www.rancher.com/
 [k3s]: https://github.com/rancher/k3s
-[kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/

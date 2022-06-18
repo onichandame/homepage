@@ -1,32 +1,50 @@
 ---
-title: 'Use Container for Development'
+title: 'Boost Development with Container'
 ---
 
-As a full-time developer working in office, I have to regularly switch between 'working-at-home' and 'working-at-office' modes. Thus it comes with a major problem: how to synchronize the development environment at home and the office?
+tl;dr: My development environment is packed into a [docker image][src]
 
-# Thoughts
+# Background
 
-The first thought that naively comes to my mind is automating the setup process of the development environment. As a half DevOps, scripting is the first tool that comes up when I need to solve a problem.
+As a full-time developer, I have to regularly switch between 'work-from-home' and 'work-in-office' modes. Thus a major problem: how to synchronize the development environments between these 2 places?
 
-However, scripting does not treat different OS/platforms equally. So I have to write different scripts for different OS. This approach does not guarantee the synchronization between different OS. Therefore scripting does not help.
+The ideal solution is to configure my development environment once and for all. The deployment should also be cheap in both time and economy. The cost of reset and migration should be minimal, so that I can easily recover from a broken instance.
 
-Now the Container comes to rescue. I had to deal with containers a lot for work so it is not too unfamiliar. Container suits the need for the following reasons:
+# Thoughts & Design
 
-1. abstracts the OS so only 1 OS needs to be considered
-2. sharing files with different host OS is easy
-3. available on most major OS
+The most old-school approach is scripting all the setup that I had to do by hand. However, it is not trivial to script across different OS/platforms. I would have to write different scripts for different OS which do hopefully the same thing. Moreover, in the long term such a fragile system is not maintainable.
 
-# Challenges
+Now the Container comes to rescue. It suits my need for the following reasons:
 
-It is not trivial to use container for development. First of all I need to access the tty of a container using `-it` flag. Then the development files need to be stored on the host for permanent storage using `-v` flag. Lastly flag `-p` is required to map the ports of the container and the host. Apart from these common setup, several unusual problems need to be solved.
+1. only 1 OS needs to be considered
+1. it can be run on most modern OS
+1. its behaviour is consistent across restarts
 
-Basic knowledge of Linux configuration and commands are preassumed.
+## IDE
 
-## Podman
+The first question is what IDE to use. Vscode does not fit well as it is fundamentally a desktop app and GUI support in containers is very limited. I chose Neovim as I am most familiar with _Vim-like_ editors. Vim 8 is another possible candidate but I prefer Neovim because it's community-driven.
+
+Neovim provides built-in language server protocol(LSP) support. All I need is to steal the configurations from all over the internet. Check my settings in [the image][src].
+
+## Deployment
+
+The next and the most difficult question is how to use the image I just built. It is not as simple as running `docker run --rm -it onichandame/dev bash`. Containers do not persist peripheral storage so all my codes not backed-up would be lost during restarts. Then mount a host path you may say. But remember that my initial problem is to access a single development environment from different locations. How am I supposed to access a project stored in my office from home?
+
+Kubernetes(k8s) is the answer. I will not go into the details here, because it is quite straightforward once you decide to deploy it on k8s. I basically deploys to a k8s cluster on the internet. So I can access it from anywhere if only I have kubectl configured locally. A small hint: consider statefulset + ingress.
+
+# Other Attempts
+
+Before the final answer was found, I have tried many approaches where many lessons were learned.
+
+## Local Container Runtime
+
+Before discovering k8s, I tried running the container locally on different platforms.
+
+### Podman
 
 Podman is a daemonless container runtime. It requires `--security-opt label=disable` to bypass SELinux for sharing files with the host.
 
-Podman treats containers differently than Docker. Each plain container created by podman is not allocateda new IP as it would require root permission. To communicate 2 rootless containers, a pod is requried to contain the 2 containers. The [official guide][pod] tells how to setup pods and containers within pods. [This guide][pod-com] tells how to setup communication between containers in the same pod. However, the creation of pod requires pulling image from k8s.gcr.io, which is blocked by GFW. Thus a mirror registry must be used.
+Podman treats containers differently than Docker. Each plain container created by podman is not allocated with a new IP as it would require root permission. To communicate 2 rootless containers, a pod is needed to contain the 2 containers. The [official guide][pod] tells how to setup pods and containers within pods. [This guide][pod-com] tells how to setup communication between containers in the same pod. However, the creation of pod requires pulling image from k8s.gcr.io, which is blocked by GFW. Thus a mirror registry must be used.
 
 According to `man container-registries.conf`, the system-wide configuration is `/etc/containers/registries.conf`. The location may differ on different platforms, check it carefully. In the default configuration shipped with CentOS 8, the format v1 is used. Mirrors are only available in format v2, therefore the configuration needs to be changed to v2:
 
@@ -43,105 +61,27 @@ location="registry.cn-hangzhou.aliyuncs.com/google_containers"
 
 Thanks to [this issue][pod-mirror]
 
-After removing the old configuration and adding the above configuration, an AliCloud mirror is used. Now the pod can be created.
+After removing the old configuration and adding the above configuration, an AliCloud mirror is used. Now pods can be created.
 
-The containers inside pods cannot communicate directly with host, namely port mapping. The port mapping needs to be set on the creation of the pods.
-
-```bash
-podman pod create -p 30000:3000
-```
-
-## Keep Container Running
-
-A container will exit as soon as the PID 1 process exits. This is not a problem for stateless container run by `docker run -it --rm`. But on kubernetes, all containers has to be run in background and use `kubectl exec -it` to enter the interactive shell.
-
-To run a container in background indefinitely, several options are available:
-
-1. `tail -f /dev/null`
-2. `bash`
-
-The first option has a problem that it does not respond correctly to SIGKILL/SIGINT. Therefore the pod will be stuck in the `Terminating` stage forever.
-
-The second option requires a pseudo-tty session to keep the bash from exiting.
-
-To conclude, the `tail` approach has no elegant workaround for its problem, whereas the `bash` approach's problem can be fixed by simply providing a pseudo-tty session.
-
-## Reduce Image Size
-
-The final image size mainly depends on the choice of the Linux distro. The traditional distros like CentOS is not optimized for containerization so the images based on it are inevitably bloated. My choice is Alpine 3. The image based on Alpine 3 weighs around 1.8 GB whereas the CentOS version weighs more than 3 GB.
-
-## NOFILE Limit
-
-When developing a frontend with plenty of source files and dependencies, the development server usually needs to watch all the changes in the source files. This sometimes exceeds the system's watch file limit.
-
-The watch file limit is defined by a hard limit and a soft limit. When the soft limit is exceeded, the user is warned. When the hard limit is hit, the watcher's process throws an error. Therefore both limits need to be raised.
-
-The solution is to increase the host's NOFILE limit. The containers automatically inherits the host's limit. <a to={'../ulimit'}>Check this</a> for the detailed setup.
-
-## UTF-8 Encoding
-
-As the base image is usually minimized for performance, the default encoding is set to ASCII. This won't be a problem if the host machine has UTF-8 enabled and that container interface directly displays the output as the encoded characters are passed straight to the host for decoding. However, it gets problematic when using tmux inside the container as tmux only passes the decoded character to the screen which it does not understand.
-
-The first step is the add special characters to the container. In my case, I added Simplified Chinese by installing `glibc-langpack-zh`. Run `locale -a` to check if the desired language has been installed.
-
-The last step is setting the default encoding to UTF-8 by adding `export LANG="zh_CN.UTF-8"` and `export LC_ALL="zh_CN.UTF-8"` to bashrc.
-
-## Windows 10
-
-Docker was originally made for Linux. Running in on Windows is always troublesome. Here I records the main issues solved for Windows 10.
-
-### Docker Engine
-
-At the time writing this sentence, Docker Desktop mainly provides 2 engines: HyperV(legacy) and WSL 2.
-
-HyperV works as a traditional VM hypervisor, which is utilized by Docker Desktop to maintain a VM where the docker daemon is run.
-
-WSL 2 on the other hand, provides a deeply integrated Linux kernel. This is a faster solution so I choose to use this engine.
-
-The first step is to install WSL 2. Check [this][wsl] for the official guide.
-
-Having WSL 2 installed, now check the **Use the WSL 2 based engine** option in the General settings of the Docker Desktop. Restart the docker daemon for this action to take effect. **Note: by restarting the daemon, all the images in the old daemon will be lost!**.
-
-WSL 2 at this moment suffers from a fatal bug. If you try to start a Linux distro backed by WSL 2, and see the error message **the attempted operation is not supported for the type of object referenced.**, it means that WinSock has caused the WSL 2 to collapse. According to [this issue][winsock], running `netsh winsock reset` as admin works around the bug once and for all.
-
-### HyperV
-
-No matter you choose HyperV or WSL 2 as the engine, HyperV service must be enabled. However, MicroSoft made a very bad default behaviour that disables virtualization in BIOS once the HyperV related services are enabled. Thus it is required to go to BIOS and enable hardware virtualization after enabling HyperV every time.
-
-Thanks to [this issue][hyperv]
-
-## Kubernetes
-
-My production environment is kubernetes, local or cloud. Therefore it would be more convenient for me to setup a development environment that is consistent with the production environment.
-
-The CLI tool to manage a kubernetes cluster is [kubectl][kubectl]. This tool can totally replace the `docker` CLI when a k8s cluster is available. However, I find it annoying to install a dangling executable as it is not available in package managers of many platforms, like ubuntu/apt, redhat/dnf etc. A simple solution is to run it in a docker container:
+The containers inside pods cannot communicate directly with host, namely port mapping. The port mapping needs to be set on the creation of the pods. For example:
 
 ```bash
-# alias to `kubectl`
-docker run -it --rm -v <path to kubeconfig directory>:/root/.kube onichandame/docker-kubectl:latest
+podman pod create -p 3000:3000
 ```
 
-To run development environment in kubernetes, things are different.
+### Local Kubernetes
 
-### Setup
+Before having access to a cluster on the internet, I had to play with local k8s deployments.
 
-Setting up a kubernetes cluster is not as straightforward as running Docker Desktop. The official way to setup a development cluster is [minikube][minikube]. But it heavily depends on the VM stack. Hence it consumes more resources compared with other alternatives. [Kind][kind] and [k3d][k3d] are two alternatives making use of containers instead of virtual machines.
+#### Minikube
+
+The official method to setup a development cluster is [minikube][minikube]. But it heavily depends on the traditional VM stack, which means that it consumes more resources compared with other alternatives.
 
 #### Kind
 
-[kind][kind] provides an official executable to manage the cluster. One can follow the official guides to install it.
+[Kind][kind] starts a k8s cluster based on a local docker runtime. It provides an official executable to help manage the cluster. One can follow the official guides to install it.
 
-Based in China, Google services including the gcr registry is not available. Therefore a mirror registry must come to rescue. [kind][kind] receives such configurations from a yaml file, just like how k8s receives configuration for a deployment. I have created [a configuration file](https://github.com/onichandame/docker-dev/blob/master/kube/cluster.yaml) for it.
-
-One thing to note here is the `nodes.role.extraMounts` should be modified to map a directory on the host machine to the worker node, if persistent storage is desired.
-
-Having saved the configuration into cluster.yaml, one can boot up a cluster by running the command below:
-
-```bash
-kind create cluster --config git/kube/cluster.yaml
-```
-
-The next step is to install ingress controller. From my experience it would be very inconvenient if services are exposed to different ports instead of a single port but different domains.
+The next step is to install an ingress controller. From my experience it would be very inconvenient if services are exposed to different ports instead of a single port but different domains.
 
 According to the [official doc][kind-ingress], one can choose an ingress controller from 3: Ambassador, Contour and Nginx. Based on my experiments, only the ambassador works well in China. To install the ambassador controller, run the following commands.
 
@@ -152,9 +92,9 @@ kubectl apply -n ambassador -f https://github.com/datawire/ambassador-operator/r
 
 After all the pods in the namespace `ambassador` are up, the controller is ready for use.
 
-Another concern is that all the ingresses using ambassador should be annotated by `kubernetes.io/ingress.class: ambassador` so that the ambassador controller is notified to expose the annotated ingress.
+Another concern is that all the ingresses using ambassador should be annotated by `kubernetes.io/ingress.class: ambassador`.
 
-To install other ingress controllers, the administrator needs to make sure that the gateway is installed on the node where the the extra port mapping rules are applied.
+To install other ingress controllers, you need to make sure that the gateway is installed on the node where the the extra port mapping rules are applied.
 
 I choose to install Istio as it provides many more useful features relating to the monitoring stuff.
 
@@ -173,7 +113,7 @@ kubectl rollout restart deploy/coredns -n kube-system
 
 #### K3D
 
-[K3d][k3d] is a product of [Rancher][rancher]. It is based on [k3s][k3s], a super-lightweight kubernetes distribution suitable for low-resource scenarios, such as IoT or local testing environment. Like [kind][kind], [K3d][k3d] runs as many nodes as wished in containers to simulate a multi-node cluster. But this is much lighter than kind.
+[K3d][k3d] is a product of [Rancher][rancher]. It is based on [k3s][k3s], a super-lightweight kubernetes distribution suitable for low-resource environments, such as IoT or local testing environment. Like [Kind][kind], [K3d][k3d] runs as many nodes as wished in containers to simulate a multi-node cluster. But this is much lighter than kind.
 
 [K3d][k3d] relies on the command line arguments to customize the cluster. The command I use is:
 
@@ -183,50 +123,77 @@ k3d cluster create --no-lb --k3s-server-arg='--disable=traefik' -p 80:30001@agen
 
 The arguments specifically disables the external load balancer and traefik. As I will install istio manually as a replacement. The port mapping argument is also for istio installation. the `-a 3` argument instructs k3d to spin up 3 worker nodes. the volume mount argument maps the workspace on the host to all the nodes for persistent data storage. The configuration mounted to `/etc/rancher/k3s/registries.yaml` replaces the official registries of docker.io or gcr.io by the mirror registries to speed up the image pulling process.
 
-The installation of istio follows the same instruction above.
+The installation of istio follows the same instruction [above](#kind).
+
+### Docker Desktop
+
+Docker was originally made for Linux. Running on Windows is always non-trivial. Here I record the main issues solved for Docker Desktop on Windows 10.
+
+#### Docker Engine
+
+Docker Desktop mainly provides 2 engines: HyperV(legacy) and WSL 2.
+
+HyperV works as a traditional VM hypervisor, which is utilized by Docker Desktop to maintain a VM where the docker daemon is run.
+
+WSL 2 on the other hand, provides a deeply integrated Linux kernel. This is a faster solution.
+
+The first step is to install WSL 2. Check [this][wsl] for the official guide.
+
+Having WSL 2 installed, now check the **Use the WSL 2 based engine** option in the General settings of the Docker Desktop. Restart the docker daemon for this action to take effect. **Note: by restarting the daemon, all the images in the old daemon will be lost!**.
+
+WSL 2 at this moment suffers from a fatal bug. If you try to start a Linux distro backed by WSL 2, and see the error message `the attempted operation is not supported for the type of object referenced.`, it means that WinSock has caused the WSL 2 to collapse. According to [this issue][winsock], running `netsh winsock reset` as admin works around the bug once and for all.
+
+#### HyperV
+
+No matter you choose HyperV or WSL 2, HyperV service must be enabled. However, MicroSoft made a very bad default behaviour that disables virtualization in BIOS once the HyperV related services are enabled. Thus it is required to go to BIOS and enable hardware virtualization after enabling HyperV every time.
+
+Thanks to [this issue][hyperv]
+
+# Misc
+
+## Keep Container Running
+
+A container will exit as soon as the PID 1 process exits. This is not a problem for stateless containers. But on k8s, all containers have to run in background.
+
+To run a container in background indefinitely, two options are available:
+
+1. `tail -f /dev/null`
+2. `bash`
+
+The first option has a problem that it does not respond correctly to SIGKILL/SIGINT. Therefore the pod will be stuck in the `Terminating` stage forever.
+
+The second option requires a pseudo-tty session to keep the bash from exiting.
+
+To conclude, the `tail` approach has no elegant workaround for its problem, whereas the `bash` approach's problem can be fixed by simply providing a pseudo-tty session.
+
+## NOFILE Limit
+
+When developing a project with plenty of source files and dependencies, the development server usually needs to watch the changes in all the source files. Sometimes it can exceed the system's watch file limit.
+
+The watch file limit is defined by a hard limit and a soft limit. When the soft limit is exceeded, the user is warned. When the hard limit is hit, the watcher's process throws an error. Therefore both limits need to be raised.
+
+The solution is to increase the host's NOFILE limit. The containers automatically inherits the host's limit. <a href={'./ulimit'}>Check this</a> for the detailed setup.
+
+## UTF-8 Encoding
+
+The base image is usually minimized for performance, so the default encoding isusually set to ASCII. This won't be a problem if the host machine has UTF-8 enabled and that container interface streams the output in the raw binary form. However, it gets problematic when using tmux inside the container as tmux needs to decode the characters then prints them.
+
+The first step is to add locales to the container. In my case, I added Simplified Chinese by installing `glibc-langpack-zh`. Run `locale -a` to check if the desired language has been installed.
+
+The last step is setting the default encoding to UTF-8 by adding `export LANG="zh_CN.UTF-8"` and `export LC_ALL="zh_CN.UTF-8"` to bashrc or the Dockerfile.
 
 ## Port Forwarding
 
-To access a web server running in a container from the host, port mapping is the best option. It is as simple as adding the flag `-p <host port>:<container port>` to the command creating the container. However, one caveat of this setup is that the port-mapping rules cannot be updated once the container has been created. Hence within the container, the web servers must listen on the same port. But different projects use different settings. One cannot rely on the project settings complying with the local container settings.
+To access a web server running in a container from the host, port mapping is the only option. It is as simple as adding the flag `-p <host port>:<container port>` to the command creating the container. However, one caveat of this setup is that the port-mapping rules cannot be updated once the container has been created. Hence within the container, the web servers must listen on a predefined port. But this method does not solve all the problems. For example the dev server simply does not allow the user to specify a port, like Gatsby's fast refresh server.
 
-A solution to this problem is to redirect the requests for the mapped port to the port the web server is listening on. Socat is a tool designed for this.
+One solution to this problem is to add routing rules inside the container. Socat is a tool designed for this.
 
 ```bash
 # redirect requests for the mapped port to the server port
 socat TCP4-LISTEN:<mapped port>,fork,reuseaddr TCP4:localhost:<server port>
 ```
 
-## Vim in Docker
-
-In many cases a fully functional cluster is too heavy to deploy, but a pre-configured vim in a docker image is needed. The best solution would be to mount the file being edited to the container and use the vim inside the container to edit the file. The setup is of course platform-dependent.
-
-Powershell:
-
-```powershell
-function vim {
-  $filepath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($args[0])
-  $parent = Split-Path -Path $filepath
-  $filename = Split-Path -Path $filepath -Leaf
-  invoke-expression "docker run -it --rm -e SSHD_DISABLED=true -e DIND_DISABLED=true -v ${parent}:/parent -w /parent <image name> vim $filename"
-}
-```
-
-# Implementation
-
-The structure of the source project is as follows:
-
-![struc](/image/container-development-structure.png)
-
-The Dockerfile is the instruction to build the final image.
-
-The files folder contains all the configuration files like vimrc and bashrc.
-
-[Check this][src] for the source files.
-
-[Check this][hub] for the built image.
-
 [src]: https://github.com/onichandame/docker-dev/
-[hub]: https://hub.docker.com/repository/docker/onichandame/docker-dev
 [wsl]: https://docs.microsoft.com/en-us/windows/wsl/wsl2-install
 [winsock]: https://github.com/microsoft/WSL/issues/4177
 [hyperv]: https://answers.microsoft.com/en-us/windows/forum/all/resolving-wslregisterdistribution-error-0x80370102/412cf42b-1424-444c-bb95-4aa2b5fe5eaf
@@ -239,4 +206,3 @@ The files folder contains all the configuration files like vimrc and bashrc.
 [k3d]: https://github.com/rancher/k3d/
 [rancher]: http://www.rancher.com/
 [k3s]: https://github.com/rancher/k3s
-[kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
