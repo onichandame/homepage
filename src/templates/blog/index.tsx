@@ -1,4 +1,13 @@
-import { Box, Grid, Typography } from '@mui/material'
+import {
+  Box,
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
 import { graphql, PageProps } from 'gatsby'
 import { MDXRenderer } from 'gatsby-plugin-mdx'
 import { MDXProvider } from '@mdx-js/react'
@@ -47,6 +56,27 @@ export default ({
               <Grid item>
                 <MDXProvider
                   components={{
+                    table: ({ children }) => <Table>{children}</Table>,
+                    thead: ({ children }) => <TableHead>{children}</TableHead>,
+                    tbody: ({ children }) => <TableBody>{children}</TableBody>,
+                    tr: ({ children }) => <TableRow>{children}</TableRow>,
+                    th: ({ children }) => (
+                      <TableCell component="th" align="center">
+                        {children}
+                      </TableCell>
+                    ),
+                    td: ({ children }) => <TableCell>{children}</TableCell>,
+                    img: props => (
+                      <Grid container direction="column" alignItems="center">
+                        <Grid item>
+                          <Box
+                            component="img"
+                            sx={{ maxWidth: `100%` }}
+                            {...props}
+                          />
+                        </Grid>{' '}
+                      </Grid>
+                    ),
                     pre: ({ children }) => (
                       <Box
                         component="pre"

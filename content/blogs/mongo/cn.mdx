@@ -10,7 +10,7 @@ title: '基于MongoDB开发'
 
 最直观且简单的方案是将数据分割保存在不同的文档中。对于初始文档较小的数据来说，这是最简单的解决方案。
 
-![flow](/image/split-document.png)
+![flow](https://res.cloudinary.com/onichandame/image/upload/v1655618888/pic/blog/split-document_b5i3qn.png)
 
 如上图所示，当向文档中插入新数据时，初次尝试默认可以成功。当收到错误码 17419 或 10334 时，服务器因最终文档会超过 16 MB 而拒绝请求。这时就必须创建新的文档来储存数据。
 
