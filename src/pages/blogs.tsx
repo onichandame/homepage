@@ -7,8 +7,8 @@ import {
   Grid,
   Typography,
 } from '@mui/material'
-import { graphql, PageProps } from 'gatsby'
-import { useI18next, useTranslation } from 'gatsby-plugin-react-i18next'
+import { graphql, navigate, PageProps } from 'gatsby'
+import { useTranslation } from 'gatsby-plugin-react-i18next'
 import { PropsWithChildren } from 'react'
 
 export default ({
@@ -88,7 +88,6 @@ export default ({
 }
 
 function BlogTile({ blog }: PropsWithChildren & { blog: Blog }) {
-  const { navigate } = useI18next()
   return (
     <Card sx={{ width: 240 }} variant="outlined">
       <CardActionArea onClick={() => navigate(blog.metadata.fields.name)}>

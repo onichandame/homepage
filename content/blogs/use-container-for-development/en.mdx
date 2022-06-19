@@ -8,6 +8,8 @@ tl;dr: My development environment is packed into a [docker image][src]
 
 As a full-time developer, I have to regularly switch between 'work-from-home' and 'work-in-office' modes. Thus a major problem: how to synchronize the development environments between these 2 places?
 
+Another problem I face everyday is the lack of computing resources. Very often my local machine crashes due to OOM by only a couple of jobs.
+
 The ideal solution is to configure my development environment once and for all. The deployment should also be cheap in both time and economy. The cost of reset and migration should be minimal, so that I can easily recover from a broken instance.
 
 # Thoughts & Design
@@ -31,6 +33,17 @@ Neovim provides built-in language server protocol(LSP) support. All I need is to
 The next and the most difficult question is how to use the image I just built. It is not as simple as running `docker run --rm -it onichandame/dev bash`. Containers do not persist peripheral storage so all my codes not backed-up would be lost during restarts. Then mount a host path you may say. But remember that my initial problem is to access a single development environment from different locations. How am I supposed to access a project stored in my office from home?
 
 Kubernetes(k8s) is the answer. I will not go into the details here, because it is quite straightforward once you decide to deploy it on k8s. I basically deploys to a k8s cluster on the internet. So I can access it from anywhere if only I have kubectl configured locally. A small hint: consider statefulset + ingress.
+
+## Local Setup
+
+After all the hard work, I still need to setup my local machines in order to use the remote deployment. Only Windows setup is recorded here:
+
+1. [Nerd Font][https://www.nerdfonts.com/]
+1. [Git][https://git-scm.com/download/win]
+1. [NeoVim][https://git-scm.com/download/win]
+1. [kubectl][https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/]
+   1. kubeconfig for the cluster
+1. Windows Terminal
 
 # Other Attempts
 

@@ -2,11 +2,11 @@
 title: 'Blog Made By Gatsby'
 ---
 
-tl;dr: check [the source](https://github.com/onichandame/homepage) of my own blog.
+tl;dr: check [the source](https://github.com/onichandame/homepage) of this site.
 
 # Motivation
 
-Having read [this blog][why-self-host], I am convinced to host my personal blog by the point that self-hosted blogs give more ways to monetize. Every developer wants to sell his/her skills, just like me.
+Having read [this blog][why-self-host], I am convinced to host my personal blog.
 
 There are 2 ways to build a self-hosted blog in general: using a popular blog builder such as WordPress, or build the HTMLs from "scratch".
 
@@ -34,11 +34,11 @@ As one of my previous projects used Next.js, I am know server side rendering(SSR
 | must be deployed with a server   | deployed as plain html/css/js bundles |
 | fetches data in real-time        | requires rebuild to change the data   |
 
-Based on the principle of SSG, 3 baselines need to be followed:
+How does SSG fit the need to build a full-blown website then? Apparently with a custom server you can host both webpages and data in the same place. For example, the blogs as data can be stored in the server as JSON/Markdown etc, while the pages are served in another directory on the server. But with Gatsby the data must be consumed by the pages during buildtime.
 
-1. separate the code for buildtime and the code for runtime
-1. make sure all data can be statically fetched at buildtime
-1. write runtime code only for browser(not to be mixed with Node.js server)
+### Fetch Data by GraphQL
+
+During buildtime, Gatsby spins up a server providing all the data required. The pages then query this server to fetch the portion of data they each needs. Remember this step only happens during buildtime.
 
 ## Localization
 
@@ -64,60 +64,15 @@ According to [this blog][heading-anchor], this feature can be easily added.
 
 ## Deployment
 
-The last problem is to host the site. There are generally 3 methods to choose:
+The last problem is to host the site. There are generally 2 methods to choose:
 
 1. host on a self-managed server
-1. buy a managed hosting service
-1. find a free hosting service
+1. host on a public cloud
 
-The option 1 and 2 are for lazy users who do not want to spend time digging. I happen to know a couple hosting services: Github Pages and Cloudflare Pages. The latter requires one to have a personal domain registered with Cloudflare though.
-
-## Gatsby Build Process
-
-People from the background of server side coding may intuitively write codes that are left to run on server during runtime. This is a big no when using Gatsby, or any other [SSG](#static-site-generation) tool. Gatsby only allows 2 runtimes: buildtime and browser runtime.
-
-During buildtime, all the data is retrieved to create static HTML. During browser runtime, only browser API is available.
-
-The codes for buildtime reside in the following locations:
-
-1. page query and static query(GraphQL queries are run once at buildtime)
-2. `gatsby-node.js`, `gatsby-config.js`, `gatsby-browser.js` and `gatsby-ssr.js` under the project's root directory
-
-All other codes are compiled to static HTML at buildtime.
-
-For details of the `gatsby-node.js` etc. see [the conceptual guid][concept].
-
-## GraphQL
-
-The usage of GraphQL in Gatsby is somewhat unusual. In traditional data retrieval modes, a client fires a query to a backend API and the backend respond with the required data. Naively I thought it happens during runtime. But Gatsby runs all GraphQL queries during buildtime. Then all the queries are stripped away from the output.
-
-Therefore all the queries must be given all the required data and schema during buildtime. One of the main sources of data is `gatsby-config.js` and `gatsby-node.js`. check [the guide][concept] for details.
-
-## Internationalization
-
-To unify page level and field level internationalization, the following design is made.
-
-### Page Level
-
-Only mdx files are accepted for page level translation, such as posts and resume page.
-
-The example source structure of a post is:
-
-![post](/i18n-post.png)
-
-All translations of the page are kept in one folder, which is named as the slug of the post. The file name represents the locales. All the information is extracted by codes in `gatsby-node.js` then is passed down to the corresponding pages.
-
-As all the pages have the same layout, a template is passed to the `gatsby-plugin-mdx` that is applied to all post pages.
-
-### Field Level
-
-Field level translations are kept in a similar structure, where the file name represents the locale. A custom hook is used to retrieve those translations.
-
-Check [my blog][my-blog] for the final result!
+I happen to know a couple of free hosting services: Github Pages and Cloudflare Pages. The latter requires one to have a personal domain registered with Cloudflare though.
 
 [gatsby]: https://www.gatsbyjs.org
 [why-self-host]: https://bloggingexplorer.com/self-hosted-blog
 [i18n]: https://github.com/microapps/gatsby-plugin-react-i18next
 [heading-anchor]: https://johno.com/mdx-table-of-contents-components-in-gatsby
-[concept]: https://www.gatsbyjs.org/docs/conceptual-guide/
 [my-blog]: https://onichandame.com
