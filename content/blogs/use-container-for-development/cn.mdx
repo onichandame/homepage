@@ -8,6 +8,8 @@ tl;dr: 我的开发环境全在这个[docker 镜像][src]中
 
 作为一个全职开发者，我经常需要在办公室和家里交替办公。由此导致了一个问题：如何同步家里和办公室里的开发环境？
 
+另一个每天都会遇到的问题是计算资源的紧缺。我的电脑经常在跑一两个重进程时 OOM。
+
 最佳的效果是只需要配置一次开发环境，而且部署起来轻量简单，在遇到问题时可以很容易地用重置来解决。
 
 # 思考及设计
@@ -31,6 +33,17 @@ Neovim 现在提供内置的 LSP 支持，只需要从网上搜寻一些配置�
 更重要的问题是如何使用准备好的容器镜像。不能简单地用`docker run --rm -it onichandame/dev bash`启动一个容器然后就直接开始开发，因为容器的数据没有持久化，重启就丢了。最简单粗暴的方案就是挂载宿主机的路径，但是我必须考虑在不同地点做开发，办公室的宿主机只能在办公室范围内提供服务。
 
 答案是 Kubernetes(k8s)。一旦决定采用 k8s 问题就变得简单了，因此我不会提供所有细节。简单来说，我将容器部署在公网上的集群，因此在任何地点只要本地有 kubectl 都能直接使用。小提示：考虑 statefulset + ingress。
+
+## 本地配置
+
+在完成上面所有工作后，我仍然需要对本地机器做一些配置以使用远端的环境。这里只记录 Windows 系统的配置：
+
+1. [Nerd Font][https://www.nerdfonts.com/]
+1. [Git][https://git-scm.com/download/win]
+1. [NeoVim][https://git-scm.com/download/win]
+1. [kubectl][https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/]
+   1. 集群的 kubeconfig
+1. Windows Terminal
 
 # 其它尝试
 
