@@ -199,7 +199,7 @@ The last step is setting the default encoding to UTF-8 by adding `export LANG="z
 
 To access a web server running in a container from the host, port mapping is the only option. It is as simple as adding the flag `-p <host port>:<container port>` to the command creating the container. However, one caveat of this setup is that the port-mapping rules cannot be updated once the container has been created. Hence within the container, the web servers must listen on a predefined port. But this method does not solve all the problems. For example the dev server simply does not allow the user to specify a port, like Gatsby's fast refresh server.
 
-One solution to this problem is to add routing rules inside the container. Socat is a tool designed for this.
+One solution to this problem is to add routing rules inside the container. socat is a tool designed for this.
 
 ```bash
 # redirect requests for the mapped port to the server port
