@@ -166,7 +166,7 @@ HyperV 就是一个传统的 VM hypervisor，Docker 用它建立一个跑 docker
 
 ## 防止容器关闭
 
-容器都会在 PID 1 的进程退出时自动关闭。对使用`docker run -it --rm`与逆行的无状态容器来说这不是问题。但在 kubernetes 中，所有容器都需要在后台运行并用`kubectl exec -it`进入容器进行交互。
+容器都会在 PID 1 的进程退出时自动关闭。对使用`docker run -it --rm`的无状态容器来说这不是问题。但在 kubernetes 中，所有容器都需要在后台运行并用`kubectl exec -it`进入容器进行交互。
 
 为永久运行一个容器，有两种方法：
 
