@@ -8,8 +8,9 @@ tl;dr: 我的个人网站[已开源](https://github.com/onichandame/homepage)
 
 在阅读[这个博客][why-self-host]之后，我决定做一个自己 host 的博客站点。
 
-There are 2 ways to build a self-hosted blog in general: using a popular blog builder such as WordPress, or build the HTMLs from "scratch".
-一般有 2 种方法制作博客站点：使用所见即所得的博客制作工具如 WordPress 或从零开始写网页。
+There are 2 ways to build a self-hosted blog in general: using a popular blog
+builder such as WordPress, or build the HTMLs from "scratch". 一般有 2 种方法制
+作博客站点：使用所见即所得的博客制作工具如 WordPress 或从零开始写网页。
 
 我决定使用一个标准的开发框架：[Gatsby][gatsby]，因为我能。
 
@@ -25,11 +26,14 @@ As prerequisite, one is expected to know HTML, CSS, JS, TS and React.
 
 # 挑战
 
-在开始这个项目之前，我对 Gatsby 没有任何了解。因此我学习 Gatsby 完成这个项目的过程对任何想学习 Gatsby 的新手也有参考价值。
+在开始这个项目之前，我对 Gatsby 没有任何了解。因此我学习 Gatsby 完成这个项目的过
+程对任何想学习 Gatsby 的新手也有参考价值。
 
 ## 生成静态网站
 
-因为我在上一个项目使用过 Next.js ，我对服务器渲染（SSR）有充分的了解。但是这个经验对 Gatsby 完全无效，因为它是一个静态网站生成器（SSG）。这种基本的差异导致我在学习的过程中遇到很多坑，因此我记录了它们的区别。
+因为我在上一个项目使用过 Next.js ，我对服务器渲染（SSR）有充分的了解。但是这个经
+验对 Gatsby 完全无效，因为它是一个静态网站生成器（SSG）。这种基本的差异导致我在
+学习的过程中遇到很多坑，因此我记录了它们的区别。
 
 | SSR                              | SSG                                   |
 | -------------------------------- | ------------------------------------- |
@@ -43,31 +47,41 @@ As prerequisite, one is expected to know HTML, CSS, JS, TS and React.
 | 部署时必须搭配服务端   | 只能部署静态的 html/css/...文件 |
 | 实时获取数据           | 数据变化需要重新编译才能生效    |
 
-那么应该如何使用 SSG 构建一个完善的网站？很显然如果有一个自定义服务器，数据和网页可以放在一起，例如文章数据以 JSON 或 Markdown 格式存储，同时也可以把网页存储在服务器的另一个目录下。但是 Gatsby 要求所有数据都要在构建时融入网页。
+那么应该如何使用 SSG 构建一个完善的网站？很显然如果有一个自定义服务器，数据和网
+页可以放在一起，例如文章数据以 JSON 或 Markdown 格式存储，同时也可以把网页存储在
+服务器的另一个目录下。但是 Gatsby 要求所有数据都要在构建时融入网页。
 
 ### 使用 GraphQL 获取数据
 
-在构建时，Gatsby 会启动一个提供所有数据的服务器，网页则可以向此服务器发起请求以获取它需要的部分数据。此过程仅在构建时发生。
+在构建时，Gatsby 会启动一个提供所有数据的服务器，网页则可以向此服务器发起请求以
+获取它需要的部分数据。此过程仅在构建时发生。
 
 ## 本地化
 
-我的博客必须要服务于英语和中文的读者，因此我的博客必须支持中英双语。这也是我决定自建博客时的主要考虑因素之一，因为现有的博客平台没有一个在中外都有强大的影响力。
+我的博客必须要服务于英语和中文的读者，因此我的博客必须支持中英双语。这也是我决定
+自建博客时的主要考虑因素之一，因为现有的博客平台没有一个在中外都有强大的影响力。
 
 在实现的层面，网络上有很多工具和案例以供参考。
 
 ### Gatsby Plugin I18next
 
-在本地化大量独立字符串时，[i18next][i18n]是一个完美的解决方案，但在细节上还有一些坑。
+在本地化大量独立字符串时，[i18next][i18n]是一个完美的解决方案，但在细节上还有一
+些坑。
 
-本地化的支持来源与一个由 context 提供的 i18next 实例，因此必须将所有的页面和组件都包在这个 context 的 provider 里面。[这个博客](https://andremonteiro.pt/gatsby-i18next-wrap-page-element/)提供了一个优雅的实现。
+本地化的支持来源与一个由 context 提供的 i18next 实例，因此必须将所有的页面和组件
+都包在这个 context 的 provider 里面
+。[这个博客](https://andremonteiro.pt/gatsby-i18next-wrap-page-element/)提供了一
+个优雅的实现。
 
 ### 手动翻译
 
-对于另一些内容很密集的页面，例如博客，我倾向于用 markdown 编辑它们，但 i18next 不支持 markdown。因此我的路子是手动生成博客页面。
+对于另一些内容很密集的页面，例如博客，我倾向于用 markdown 编辑它们，但 i18next
+不支持 markdown。因此我的路子是手动生成博客页面。
 
 ### Heading 锚
 
-markdown 有个很有用的增强，就是 heading 锚。而且它是 TOC 的必要前提。但是`gatsby-plugin-mdx`默认不提供这个支持。
+markdown 有个很有用的增强，就是 heading 锚。而且它是 TOC 的必要前提。但
+是`gatsby-plugin-mdx`默认不提供这个支持。
 
 基于[此文][heading-anchor]，添加这个特性非常简单。
 
@@ -78,7 +92,8 @@ markdown 有个很有用的增强，就是 heading 锚。而且它是 TOC 的必
 1. 在自管服务器上托管
 1. 在公有云上托管
 
-我刚好知道两个免费的托管服务：Github Pages 和 Cloudflare Pages。后一个需要注册一个个人域名。
+我恰好知道两个免费的托管服务：Github Pages 和 Cloudflare Pages。后一个需要注册一
+个个人域名。
 
 [gatsby]: https://www.gatsbyjs.org
 [why-self-host]: https://bloggingexplorer.com/self-hosted-blog

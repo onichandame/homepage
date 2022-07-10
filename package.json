@@ -47,12 +47,6 @@
 		"gatsby"
 	],
 	"license": "MIT",
-	"prettier": {
-		"trailingComma": "es5",
-		"arrowParens": "avoid",
-		"singleQuote": true,
-		"semi": false
-	},
 	"scripts": {
 		"build": "gatsby build",
 		"dev": "gatsby develop",

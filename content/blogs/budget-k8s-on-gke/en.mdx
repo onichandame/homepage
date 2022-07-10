@@ -1,0 +1,80 @@
+---
+title: 'Budget Kubernetes on GKE'
+---
+
+**Prologue:** If you want to start playing with Kubernetes, read it through. If
+you are an expert looking for a low-cost cluster like me, read it through.
+
+# Demand of Cheap Kubernetes
+
+Since its emerge, Kubernetes(k8s) has been the game changer in the IT industry.
+Today it can be viewed as the de facto standard container orchestration
+platform. The only problem is the high cost and the deep learning curve.
+
+For employers, hiring a k8s expert is not an easy and cheap task. For k8s
+enthusiasts, practicing on a k8s cluster is not cheap either. Hence there is a
+gap between the number of available experts and the demand. The solution to this
+dilemma is a cheap cluster with which amateurs can easily practice and improve
+their skills.
+
+# GKE
+
+Google Cloud provides managed k8s clusters at a cost. The sweet thing is that
+the cost can be reduced to near zero. Let me break down the costs and explain
+how to avoid them. All the information comes from the [official
+doc][gce-free-limit].
+
+## Cluster
+
+Every cluster is charged is charged at maximum $74.4 per month as the management
+fee, except the first cluster in the account. Hence $0 for management.
+
+## Nodes
+
+A cluster needs at least one node to function. In some data centers(Oregon, Iowa
+and S. Carolina) every account can use one `e2-micro`(2 cores, 1G RAM) instance
+for free. Besides the resources consumed by the basic k8s pods, there are around
+400-500 Mb of RAM available for workloads. Hence $0 for a single node. If more
+nodes are needed, spot instance is another cheap option if availability is not
+the first priority, which is true for most personal use cases.
+
+## Traffic
+
+When workloads are deployed, you may wish to expose them to the internet. The
+cost of egress traffic can be reduced by [2 measures][gce-network-pricing]:
+
+1. Use Premium network under Free Tier limit if:
+   - clients are not in China or Australia
+   - monthly usage below 1 GB
+1. Use Standard network at a very low cost($0.085 per GB)
+
+## Storage
+
+For stateful applications like databases it is vital to keep data persistent
+across workloads' lifecycle. 30 GB of standard persistent disk is free for every
+account.
+
+# How To Use
+
+All the needed pieces are provided by GKE, the only problem is how to combine
+them for practical use.
+
+The first step is to create the cluster. You can choose free single-node cluster
+or cheap multi-node cluster depending on your need. The firewall rules should be
+set so that HTTP and HTTPS requests are permitted.
+
+The second step is to install an ingress controller in order to provide service
+from multiple workloads in the cluster. The details can be found in [this
+repo][cluster].
+
+Now the cluster is ready for use. Although being too weak to support heavy
+workloads, it is sufficient for personal practice. My last advice is to setup a
+[budget][gce-budget] so that you won't be surprised if Google decides to
+withdraw its free tier offers.
+
+[gce-free-limit]:
+  https://cloud.google.com/free/docs/gcp-free-tier/#free-tier-usage-limits
+[gce-network-pricing]: https://cloud.google.com/vpc/network-pricing
+[cluster]: https://github.com/onichandame/cluster
+[gce-budget]:
+  https://cloud.google.com/blog/topics/developers-practitioners/protect-your-google-cloud-spending-budgets
