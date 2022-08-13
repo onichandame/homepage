@@ -8,15 +8,12 @@ tl;dr: 我的个人网站[已开源](https://github.com/onichandame/homepage)
 
 在阅读[这个博客][why-self-host]之后，我决定做一个自己 host 的博客站点。
 
-There are 2 ways to build a self-hosted blog in general: using a popular blog
-builder such as WordPress, or build the HTMLs from "scratch". 一般有 2 种方法制
-作博客站点：使用所见即所得的博客制作工具如 WordPress 或从零开始写网页。
+一般有 2 种方法制作博客站点：使用所见即所得的博客制作工具如 WordPress 或从零开始
+写网页。
 
 我决定使用一个标准的开发框架：[Gatsby][gatsby]，因为我能。
 
 # 背景
-
-As prerequisite, one is expected to know HTML, CSS, JS, TS and React.
 
 [Gatsby][gatsby]是一个基于 React 的多页网站制作框架。它的技术栈如下图所示：
 
@@ -34,12 +31,6 @@ As prerequisite, one is expected to know HTML, CSS, JS, TS and React.
 因为我在上一个项目使用过 Next.js ，我对服务器渲染（SSR）有充分的了解。但是这个经
 验对 Gatsby 完全无效，因为它是一个静态网站生成器（SSG）。这种基本的差异导致我在
 学习的过程中遇到很多坑，因此我记录了它们的区别。
-
-| SSR                              | SSG                                   |
-| -------------------------------- | ------------------------------------- |
-| runs server side code at runtime | no server at runtime                  |
-| must be deployed with a server   | deployed as plain html/css/js bundles |
-| fetches data in real-time        | requires rebuild to change the data   |
 
 | SSR                    | SSG                             |
 | ---------------------- | ------------------------------- |
