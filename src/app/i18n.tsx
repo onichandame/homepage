@@ -1,13 +1,14 @@
 'use client'
 
 import { PropsWithChildren, useEffect, useState } from 'react'
-import { defaultLocale, locales as recognizedLocales } from '@/locales'
 import { usePathname } from 'next/navigation'
+import defaultLocale from '@/locale/default_locale'
+import recognizedLocales from '@/locale/locales'
 
 /** 检查pathname，如果不包含locale则重定向至默认locale */
-export default function I18n({ children }: PropsWithChildren) {
-  const path = usePathname()
+export default function Localizer({ children }: PropsWithChildren) {
   const [checked, setChecked] = useState(false)
+  const path = usePathname()
   useEffect(() => {
     const userDefaultLang = parseLang(navigator.language)
     const browserDefaultLang = parseLang(

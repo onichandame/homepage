@@ -1,20 +1,13 @@
 import { PropsWithChildren } from 'react'
+import Navbar from './navbar'
 
 export default function Template({ children }: PropsWithChildren) {
   return (
     <>
-      <header>
-        <nav className="border-blue-900">
-          <ol>
-            <li>Home</li>
-          </ol>
-          <ol>
-            <li>Blog</li>
-            <li>Github</li>
-          </ol>
-        </nav>
+      <header className="bg-secondary px-12">
+        <Navbar />
       </header>
-      <main>{children}</main>
+      <main className="p-12">{children}</main>
     </>
   )
 }
