@@ -1,4 +1,4 @@
-import { locales } from '@/locales'
+import locales from "@/locale/locales";
 
 /** short texts */
 export const translation = {

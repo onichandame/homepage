@@ -1,11 +1,14 @@
 'use client'
 
+import Button from '@/component/button'
+import Dropdown from '@/component/dropdown'
 import locales from '@/locale/locales'
 import LocalizedLink from '@/locale/localized_link'
+import useDefaultLocale from '@/locale/use_default_locale'
 import useLocale from '@/locale/use_locale'
 import useUnlocalizedPath from '@/locale/use_unlocalized_path'
 import {
-  ComponentPropsWithRef,
+  ComponentPropsWithoutRef,
   PropsWithChildren,
   useEffect,
   useReducer,
@@ -89,6 +92,7 @@ function LocaleSelector() {
   const id = 'language-selector'
   const locale = useLocale()
   const [isOpen, toggleOpen] = useReducer(v => !v, false)
+  const { setDefaultLocale } = useDefaultLocale()
   return (
     <>
       <LocaleButton
@@ -101,25 +105,28 @@ function LocaleSelector() {
         <IoIosArrowDown />
       </LocaleButton>
       {isOpen && (
-        <div
+        <Dropdown
           role="menu"
           aria-labelledby={id}
           aria-orientation="vertical"
-          className="origin-center absolute ring-1 ring-opacity-5 rounded-md shadow-lg bg-button w-32"
+          className="w-32"
+          onClose={() => toggleOpen()}
         >
           <div className="py-1 flex flex-col">
             {locales.map(loc => (
               <LocalizedLink locale={loc}>
                 <LocaleButton
                   locale={loc}
-                  className={`${
-                    loc === locale ? `bg-button-hover` : `bg-button`
-                  }`}
+                  className={`${loc === locale ? `bg-button-hover` : `bg-button`
+                    }`}
+                  onClick={() => {
+                    setDefaultLocale(loc)
+                  }}
                 />
               </LocalizedLink>
             ))}
           </div>
-        </div>
+        </Dropdown>
       )}
     </>
   )
@@ -128,20 +135,23 @@ function LocaleSelector() {
 function LocaleButton({
   locale,
   children,
+  className,
   ...other
-}: { locale: (typeof locales)[number] } & ComponentPropsWithRef<'button'>) {
+}: { locale: (typeof locales)[number] } & ComponentPropsWithoutRef<
+  typeof Button
+>) {
   return (
-    <button
+    <Button
       {...other}
       className={[
-        'inline-flex space-x-2 items-center justify-center w-full rounded-md border-gray-300 shadow-sm px-4 py-2 bg-button hover:bg-button-hover',
-        other.className,
+        'inline-flex space-x-2 items-center justify-center',
+        className,
       ].join(` `)}
     >
       <LocaleIcon locale={locale} />
       <div>{locale}</div>
       {children}
-    </button>
+    </Button>
   )
 }
 
@@ -150,9 +160,8 @@ function LocaleIcon({ locale }: { locale: (typeof locales)[number] }) {
     <img
       className="h-4"
       alt={locale}
-      src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${
-        locale.split(`-`)[1]
-      }.svg`}
+      src={`http://purecatamphetamine.github.io/country-flag-icons/3x2/${locale.split(`-`)[1]
+        }.svg`}
     />
   )
 }

@@ -4,10 +4,10 @@ import Navbar from './navbar'
 export default function Template({ children }: PropsWithChildren) {
   return (
     <>
-      <header className="bg-secondary px-12">
+      <header className="bg-secondary px-page">
         <Navbar />
       </header>
-      <main className="p-12">{children}</main>
+      <main>{children}</main>
     </>
   )
 }
