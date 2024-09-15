@@ -1,0 +1,12 @@
+{
+  "name": "Zhang Xiao",
+  "title": "fullstack engineer",
+  "welcome":"hello",
+  "welcomeSubtitle":"I like to",
+  "welcomeText":"make beautiful things happen as an innovator and an engineer. SaaS is my product. AI is my area.\n\nI also like to build small things with new tools. Rust is my language. K8s is my runtime.",
+  "aboutMe": "About me",
+  "resume": "Résumé",
+  "experience": "experience",
+  "downloadCv": "download cv",
+  "contact":"contact"
+}
