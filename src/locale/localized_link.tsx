@@ -1,24 +1,27 @@
-'use client'
+"use client";
 
-import { ComponentPropsWithoutRef } from 'react'
-import useLocale from './use_locale'
-import locales from './locales'
-import useUnlocalizedPath from './use_unlocalized_path'
+import { ComponentPropsWithoutRef } from "react";
+import { Locale } from "./locales";
+import useDefaultLocale from "./use_default_locale";
+import useUnlocalizedPathname from "./use_unlocalized_path";
 
 /** parse raw link to link that contains locale
  *  href must be an absolute link to the current domain, like `/home`
- * */
+ */
 export default function LocalizedLink({
   href,
   locale,
   ...other
-}: { locale?: (typeof locales)[number] } & ComponentPropsWithoutRef<'a'>) {
-  const currentLocale = useLocale()
-  const currentUnlocalizedPath = useUnlocalizedPath()
+}: { locale: Locale } & ComponentPropsWithoutRef<"a">) {
+  const currentUnlocalizedPath = useUnlocalizedPathname();
+  const { setDefaultLocale } = useDefaultLocale();
   return (
     <a
-      href={`/${locale || currentLocale}${href || currentUnlocalizedPath}`}
+      href={`/${locale}${href || currentUnlocalizedPath}`}
+      onClick={() => {
+        setDefaultLocale(locale);
+      }}
       {...other}
     />
-  )
+  );
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import locales from '@/locale/locales'
+import {locales} from '@/locale/locales'
 import useDefaultLocale from '@/locale/use_default_locale'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'

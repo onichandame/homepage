@@ -1,5 +1,7 @@
+'use client'
+
 import { useEffect, useState } from 'react'
-import locales, { defaultLocale as appDefaultLocale } from './locales'
+import  {locales, defaultLocale as appDefaultLocale } from './locales'
 
 /** 获取defaultLocale和setDefaultLocale
  *
