@@ -11,7 +11,7 @@ export default function({ locale }: { locale: Locale }) {
   const { t } = useTranslation(locale);
   const allSections = [
     { matcher: /^\/$/, link: `/`, name: t("aboutMe") },
-    { matcher: /^\/resume/, link: `/resume`, name: t("resume") },
+    //{ matcher: /^\/resume/, link: `/resume`, name: t("resume") },
   ] as const;
   const [section, setSection] = useState<(typeof allSections)[number]["name"]>("About Me");
   const unlocalizedPath = useUnlocalizedPathname();
