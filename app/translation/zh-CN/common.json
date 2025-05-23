@@ -1,0 +1,14 @@
+{
+  "name": "张筱",
+  "title": "AI工程师",
+  "introduction": "我喜欢用我的创意和开发能力做出漂亮的产品。SaaS + AI是我的领域\n\n我还喜欢用新工具来做些小东西。Rust + K8s是我的领域",
+  "aboutMe": "关于我",
+  "blog": "博客",
+  "resume": "简历",
+  "experience": "工作经历",
+  "downloadCv": "下载简历",
+  "contact": "联系方式",
+  "en-US": "English",
+  "zh-CN": "中文",
+  "moreArticles": "更多文章"
+}
