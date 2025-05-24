@@ -3,13 +3,13 @@ import { useLoaderData } from "@remix-run/react";
 import { getLocaleFromReq, Translation, translations } from "~/translation";
 import { useEffect, useRef } from "react";
 import { getIntroduction } from "~/state/introduction";
+import { BsGithub, BsLinkedin } from "react-icons/bs";
 
 type LoaderData = { translation: Translation, introduction: string }
 
 const socialLinks = {
   linkedIn: 'https://www.linkedin.com/in/xiao-zhang-a79237169/',
   github: 'https://github.com/onichandame',
-  email: 'zxinmyth@gmail.com',
 }
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -109,38 +109,51 @@ export default function Index() {
             {introduction}
           </div>
 
+          {/* Enhanced Social Links Section */}
+          <div className="flex flex-wrap gap-4 mb-6">
+            <a
+              href={socialLinks.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-all duration-300 group"
+            >
+              <i className="fab fa-github text-gray-700 text-xl group-hover:text-black" />
+              <span className="text-gray-700 group-hover:text-black"><BsGithub /></span>
+            </a>
+
+            <a
+              href={socialLinks.linkedIn}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-full transition-all duration-300 group"
+            >
+              <i className="fab fa-linkedin text-blue-600 text-xl group-hover:text-blue-800" />
+              <span className="text-blue-600 group-hover:text-blue-800"><BsLinkedin /></span>
+            </a>
+          </div>
+
+          {/* Compact Icon Links */}
           <div className="flex justify-center space-x-6 md:justify-start">
-            {socialLinks.linkedIn && (
-              <a
-                href={socialLinks.linkedIn}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-gray-700 hover:text-blue-600 transition-all duration-300 hover:scale-125 hover:-translate-y-1"
-                aria-label="LinkedIn"
-              >
-                <i className="fab fa-linkedin" />
-              </a>
-            )}
-            {socialLinks.github && (
-              <a
-                href={socialLinks.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-gray-700 hover:text-gray-900 transition-all duration-300 hover:scale-125 hover:-translate-y-1"
-                aria-label="GitHub"
-              >
-                <i className="fab fa-github" />
-              </a>
-            )}
-            {socialLinks.email && (
-              <a
-                href={`mailto:${socialLinks.email}`}
-                className="text-2xl text-gray-700 hover:text-red-500 transition-all duration-300 hover:scale-125 hover:-translate-y-1"
-                aria-label="Email"
-              >
-                <i className="fas fa-envelope" />
-              </a>
-            )}
+            <a
+              href={socialLinks.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-3xl text-gray-700 hover:text-black transition-all duration-300 hover:scale-110"
+              aria-label="GitHub"
+              title="GitHub Profile"
+            >
+              <i className="fab fa-github" />
+            </a>
+            <a
+              href={socialLinks.linkedIn}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-3xl text-blue-600 hover:text-blue-800 transition-all duration-300 hover:scale-110"
+              aria-label="LinkedIn"
+              title="LinkedIn Profile"
+            >
+              <i className="fab fa-linkedin" />
+            </a>
           </div>
         </div>
       </div>
