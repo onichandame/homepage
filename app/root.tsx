@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  NavLink,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -32,8 +33,21 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
+        <header className="border-b bg-white p-4 sticky top-0 z-10">
+          <nav className="max-w-4xl mx-auto flex gap-6 font-medium">
+            <NavLink to="/" className="hover:text-blue-600 [&.active]:text-blue-600">Home</NavLink>
+            <NavLink to="/about" className="hover:text-blue-600 [&.active]:text-blue-600">About</NavLink>
+            <NavLink to="/projects" className="hover:text-blue-600 [&.active]:text-blue-600">Projects</NavLink>
+            <NavLink to="/blog" className="hover:text-blue-600 [&.active]:text-blue-600">Blog</NavLink>
+          </nav>
+        </header>
+        <main className="flex-1 max-w-4xl mx-auto w-full p-6">
+          {children}
+        </main>
+        <footer className="border-t p-6 text-center text-sm text-gray-500">
+          © {new Date().getFullYear()} Personal Space
+        </footer>
         <ScrollRestoration />
         <Scripts />
       </body>
