@@ -3,12 +3,13 @@
 ## 1. Architecture State
 - **Framework:** React Router v7 (Framework Mode)
 - **Runtime:** Cloudflare Workers (V8 Isolate)
-- **Routing Topology:** File-based routing (`app/routes.ts`).
-  - `/` -> `home.tsx` (Hero/Index)
-  - `/about` -> `about.tsx` (Timeline)
-  - `/projects` -> `projects.tsx` (Portfolio Grid)
-  - `/blog` -> `blog.tsx` (Article List)
-  - `/blog/:slug` -> `article.tsx` (Article Detail)
+- **Routing Topology:** File-based routing (`app/routes.ts`) with Subpath i18n (`/:lang/*`).
+  - `/` -> `_index.tsx` (Edge Redirector via Accept-Language)
+  - `/:lang` -> `home.tsx` (Hero/Index)
+  - `/:lang/about` -> `about.tsx` (Timeline)
+  - `/:lang/projects` -> `projects.tsx` (Portfolio Grid)
+  - `/:lang/blog` -> `blog.tsx` (Article List)
+  - `/:lang/blog/:slug` -> `article.tsx` (Article Detail)
 - **Global Layout:** Managed in `app/root.tsx` (Navbar, Footer, Outlet) with Tailwind CSS for styling.
 - **Rendering Mechanism:** Standard Worker entry (`workers/app.ts` or similar) delegating fetch requests to React Router.
 
@@ -25,7 +26,7 @@
 - **SEO/Meta Management:** (New) Standardize meta tag generation. Future route additions should consider a shared `app/utils/seo.ts` factory function to prevent duplication.
 
 ## 4. Future Architecture Evolution
-- **Data Decoupling (Blog & Timeline):** Migrate hardcoded static data (e.g., Career Timeline, Core Skills) to Cloudflare KV or D1 databases. Utilize React Router v7's `loader` function to fetch data directly at the Edge for optimal SSR performance.
+- **Data Decoupling (Timeline & Portfolio):** Migrate hardcoded static data (e.g., Career Timeline, Core Skills) to Cloudflare KV or D1 databases. Utilize React Router v7's `loader` function to fetch data directly at the Edge for optimal SSR performance.
 
 ## 5. Blog Engine Architecture (Phase 2 Closure)
 - **Architecture State:** Migrated blog data flow to an Edge-Native Markdown Engine.
