@@ -1,18 +1,370 @@
 {
   "en": [
     {
-      "slug": "hello-world",
-      "title": "Hello World: My First RRv7 Blog",
-      "date": "2026-04-18",
-      "description": "Exploring Cloudflare Workers Assets Binding."
+      "slug": "budget-k8s-on-gke",
+      "title": "Budget Kubernetes on GKE",
+      "date": "2022-07-10",
+      "description": "",
+      "image": "https://iservit.ro/wp-content/uploads/2021/05/gke-512-color.png"
+    },
+    {
+      "slug": "use-container-for-development",
+      "title": "Boost Development with Container",
+      "date": "2022-06-18",
+      "description": "",
+      "image": "https://avatars.githubusercontent.com/u/5429470?s=280&v=4"
+    },
+    {
+      "slug": "use-mobile-for-development",
+      "title": "Use Mobile for Development",
+      "date": "2021-05-24",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Android_robot_%282014-2019%29.svg/1200px-Android_robot_%282014-2019%29.svg.png"
+    },
+    {
+      "slug": "git-tricks",
+      "title": "Git Tricks",
+      "date": "2021-03-27",
+      "description": "",
+      "image": "https://avatars.githubusercontent.com/u/18133?s=200&v=4"
+    },
+    {
+      "slug": "react-native",
+      "title": "React Native Development",
+      "date": "2021-01-16",
+      "description": "",
+      "image": "https://www.datocms-assets.com/45470/1631026680-logo-react-native.png"
+    },
+    {
+      "slug": "connect-with-ipfs",
+      "title": "Connect with IPFS",
+      "date": "2021-01-05",
+      "description": "",
+      "image": "https://i.pinimg.com/736x/82/6a/08/826a08f262299d3f5e2b7886dd1d44ab.jpg"
+    },
+    {
+      "slug": "vim",
+      "title": "Vim",
+      "date": "2021-01-05",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Vimlogo.svg/1200px-Vimlogo.svg.png"
+    },
+    {
+      "slug": "bypass-domain-censor",
+      "title": "Bypass Domain Censorship",
+      "date": "2020-12-20",
+      "description": "",
+      "image": "https://ipfabric.io/wp-content/uploads/2020/09/bypass-firewall-cropped.jpg"
+    },
+    {
+      "slug": "yarn-workspace",
+      "title": "Monorepo with YARN Workspace",
+      "date": "2020-12-16",
+      "description": "",
+      "image": "https://i.ytimg.com/vi/G8KXFWftCg0/maxresdefault.jpg"
+    },
+    {
+      "slug": "mongo",
+      "title": "MongoDB in Development",
+      "date": "2020-09-10",
+      "description": "",
+      "image": "https://cdn-images-1.medium.com/max/480/1*Y6USBdJWvRYVyDPh8fF7_A.png"
+    },
+    {
+      "slug": "ipfs",
+      "title": "IPFS",
+      "date": "2020-08-28",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Ipfs-logo-1024-ice-text.png"
+    },
+    {
+      "slug": "node-backend",
+      "title": "Node.js Backend",
+      "date": "2020-08-05",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/1200px-Node.js_logo.svg.png"
+    },
+    {
+      "slug": "private-network-drive",
+      "title": "Private Network Drive",
+      "date": "2020-06-22",
+      "description": "",
+      "image": "https://i0.wp.com/static.techbast.com/2019/06/featured-map-network-drive.png?resize=640%2C381&ssl=1"
+    },
+    {
+      "slug": "develop-with-nats",
+      "title": "Develop with NATS",
+      "date": "2020-06-09",
+      "description": "",
+      "image": "https://www.nuget.org/profiles/NATS.io/avatar?imageSize=512"
+    },
+    {
+      "slug": "use-jest-for-unit-test",
+      "title": "Use Jest for Unit Test",
+      "date": "2020-06-09",
+      "description": "",
+      "image": "https://nx.dev/documentation/shared/jest-logo.png"
+    },
+    {
+      "slug": "github-pages",
+      "title": "Github Pages",
+      "date": "2020-06-01",
+      "description": "",
+      "image": "https://i.ytimg.com/vi/2MsN8gpT6jY/maxresdefault.jpg"
+    },
+    {
+      "slug": "gatsby-blog",
+      "title": "Blog Made By Gatsby",
+      "date": "2020-05-25",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d0/Gatsby_Logo.png/220px-Gatsby_Logo.png"
+    },
+    {
+      "slug": "centos-8-bluetooth-headset",
+      "title": "CentOS 8 Bluetooth Headset",
+      "date": "2020-05-21",
+      "description": "",
+      "image": "https://www.lenovo.com/medias/4XD1B65028-main-v1.png?context=bWFzdGVyfHJvb3R8NjM3MjR8aW1hZ2UvcG5nfGg1OC9oNWEvMTEzMzYwMDUxMjQxMjYucG5nfGQ0NTQxNGZjYjNmYzk4ZWQxZDU2ZTIwYWRmMjdmNTI0NWRiZGY1NjBiY2I2MzA2ZThlYjRiOTFiYmY1ZTg3NmE"
+    },
+    {
+      "slug": "rootless-systemd-and-podman",
+      "title": "Rootless systemd and Podman",
+      "date": "2020-05-19",
+      "description": "",
+      "image": "https://developers.redhat.com/sites/default/files/styles/article_feature/public/blog/2019/08/podman.png?itok=Gvu5ekLG"
+    },
+    {
+      "slug": "ulimit",
+      "title": "ulimit on CentOS 8.1",
+      "date": "2020-05-19",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"
+    },
+    {
+      "slug": "qcloud-ddns",
+      "title": "DDNS using QCloud and Container",
+      "date": "2020-05-14",
+      "description": "",
+      "image": "https://download.huawei.com/mdl/image/download?uuid=6e07903f1a79445d93bbb199da0d4809"
+    },
+    {
+      "slug": "react-based-3d-components",
+      "title": "React-based 3D Components",
+      "date": "2020-05-13",
+      "description": "",
+      "image": "https://media.sketchfab.com/models/350b1d11189b49919184ceda21886ebc/thumbnails/9b15af9655904474a31f0b7a48ff4955/72351db1ea1b4386aec2da04b2da68a1.jpeg"
+    },
+    {
+      "slug": "collaboration-using-blender",
+      "title": "Collaboration using Blender 3D",
+      "date": "2020-05-09",
+      "description": "",
+      "image": "https://www.computerhope.com/jargon/b/blender.png"
+    },
+    {
+      "slug": "epics-deployment",
+      "title": "EPICS Deployment",
+      "date": "2020-05-08",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/fc/EPICS_logo_svg.svg"
+    },
+    {
+      "slug": "an-epics-proxy",
+      "title": "An Epics Proxy",
+      "date": "2020-04-28",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/28/EPICS_Logo.png"
+    },
+    {
+      "slug": "single-node-k8s",
+      "title": "Single Node K8s in China",
+      "date": "2020-04-07",
+      "description": "",
+      "image": "https://kubernetes.io/images/favicon.png"
     }
   ],
   "zh": [
     {
-      "slug": "hello-world",
-      "title": "你好，世界",
-      "date": "2026-04-18",
-      "description": "这是我的第一篇双语博客测试文章。"
+      "slug": "budget-k8s-on-gke",
+      "title": "GKE与便宜的k8s集群",
+      "date": "2022-07-10",
+      "description": "",
+      "image": "https://iservit.ro/wp-content/uploads/2021/05/gke-512-color.png"
+    },
+    {
+      "slug": "use-container-for-development",
+      "title": "用容器开发",
+      "date": "2022-06-18",
+      "description": "",
+      "image": "https://avatars.githubusercontent.com/u/5429470?s=280&v=4"
+    },
+    {
+      "slug": "use-mobile-for-development",
+      "title": "Use Mobile for Development",
+      "date": "2021-05-24",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Android_robot_%282014-2019%29.svg/1200px-Android_robot_%282014-2019%29.svg.png"
+    },
+    {
+      "slug": "git-tricks",
+      "title": "Git使用技巧",
+      "date": "2021-03-27",
+      "description": "",
+      "image": "https://avatars.githubusercontent.com/u/18133?s=200&v=4"
+    },
+    {
+      "slug": "react-native",
+      "title": "使用React Native开发",
+      "date": "2021-01-16",
+      "description": "",
+      "image": "https://www.datocms-assets.com/45470/1631026680-logo-react-native.png"
+    },
+    {
+      "slug": "connect-with-ipfs",
+      "title": "链接IPFS",
+      "date": "2021-01-05",
+      "description": "",
+      "image": "https://i.pinimg.com/736x/82/6a/08/826a08f262299d3f5e2b7886dd1d44ab.jpg"
+    },
+    {
+      "slug": "vim",
+      "title": "Vim",
+      "date": "2021-01-05",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Vimlogo.svg/1200px-Vimlogo.svg.png"
+    },
+    {
+      "slug": "bypass-domain-censor",
+      "title": "绕过网站备案限制",
+      "date": "2020-12-20",
+      "description": "",
+      "image": "https://ipfabric.io/wp-content/uploads/2020/09/bypass-firewall-cropped.jpg"
+    },
+    {
+      "slug": "yarn-workspace",
+      "title": "Monorepo与YARN Workspace",
+      "date": "2020-12-16",
+      "description": "",
+      "image": "https://i.ytimg.com/vi/G8KXFWftCg0/maxresdefault.jpg"
+    },
+    {
+      "slug": "mongo",
+      "title": "基于MongoDB开发",
+      "date": "2020-09-10",
+      "description": "",
+      "image": "https://cdn-images-1.medium.com/max/480/1*Y6USBdJWvRYVyDPh8fF7_A.png"
+    },
+    {
+      "slug": "ipfs",
+      "title": "IPFS",
+      "date": "2020-08-28",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/1/18/Ipfs-logo-1024-ice-text.png"
+    },
+    {
+      "slug": "node-backend",
+      "title": "Node.js后端",
+      "date": "2020-08-05",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Node.js_logo.svg/1200px-Node.js_logo.svg.png"
+    },
+    {
+      "slug": "private-network-drive",
+      "title": "私有网盘",
+      "date": "2020-06-22",
+      "description": "",
+      "image": "https://i0.wp.com/static.techbast.com/2019/06/featured-map-network-drive.png?resize=640%2C381&ssl=1"
+    },
+    {
+      "slug": "develop-with-nats",
+      "title": "基于NATS开发",
+      "date": "2020-06-09",
+      "description": "",
+      "image": "https://www.nuget.org/profiles/NATS.io/avatar?imageSize=512"
+    },
+    {
+      "slug": "use-jest-for-unit-test",
+      "title": "使用Jest做单元测试",
+      "date": "2020-06-09",
+      "description": "",
+      "image": "https://nx.dev/documentation/shared/jest-logo.png"
+    },
+    {
+      "slug": "github-pages",
+      "title": "Github Pages",
+      "date": "2020-06-01",
+      "description": "",
+      "image": "https://i.ytimg.com/vi/2MsN8gpT6jY/maxresdefault.jpg"
+    },
+    {
+      "slug": "gatsby-blog",
+      "title": "Gatsby制作博客",
+      "date": "2020-05-25",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d0/Gatsby_Logo.png/220px-Gatsby_Logo.png"
+    },
+    {
+      "slug": "centos-8-bluetooth-headset",
+      "title": "CentOS 8与蓝牙耳机",
+      "date": "2020-05-21",
+      "description": "",
+      "image": "https://www.lenovo.com/medias/4XD1B65028-main-v1.png?context=bWFzdGVyfHJvb3R8NjM3MjR8aW1hZ2UvcG5nfGg1OC9oNWEvMTEzMzYwMDUxMjQxMjYucG5nfGQ0NTQxNGZjYjNmYzk4ZWQxZDU2ZTIwYWRmMjdmNTI0NWRiZGY1NjBiY2I2MzA2ZThlYjRiOTFiYmY1ZTg3NmE"
+    },
+    {
+      "slug": "rootless-systemd-and-podman",
+      "title": "非Root和使用Podman的systemd",
+      "date": "2020-05-19",
+      "description": "",
+      "image": "https://developers.redhat.com/sites/default/files/styles/article_feature/public/blog/2019/08/podman.png?itok=Gvu5ekLG"
+    },
+    {
+      "slug": "ulimit",
+      "title": "CentOS 8.1中的ulimit",
+      "date": "2020-05-19",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Tux.svg/1200px-Tux.svg.png"
+    },
+    {
+      "slug": "qcloud-ddns",
+      "title": "腾讯云解析与容器实现自动化DDNS",
+      "date": "2020-05-14",
+      "description": "",
+      "image": "https://download.huawei.com/mdl/image/download?uuid=6e07903f1a79445d93bbb199da0d4809"
+    },
+    {
+      "slug": "react-based-3d-components",
+      "title": "基于React的3D组件化开发",
+      "date": "2020-05-13",
+      "description": "",
+      "image": "https://media.sketchfab.com/models/350b1d11189b49919184ceda21886ebc/thumbnails/9b15af9655904474a31f0b7a48ff4955/72351db1ea1b4386aec2da04b2da68a1.jpeg"
+    },
+    {
+      "slug": "collaboration-using-blender",
+      "title": "使用Blender合作",
+      "date": "2020-05-09",
+      "description": "",
+      "image": "https://www.computerhope.com/jargon/b/blender.png"
+    },
+    {
+      "slug": "epics-deployment",
+      "title": "EPICS部署",
+      "date": "2020-05-08",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/f/fc/EPICS_logo_svg.svg"
+    },
+    {
+      "slug": "an-epics-proxy",
+      "title": "一个EPICS代理",
+      "date": "2020-04-28",
+      "description": "",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/28/EPICS_Logo.png"
+    },
+    {
+      "slug": "single-node-k8s",
+      "title": "国内安装单node k8s集群",
+      "date": "2020-04-07",
+      "description": "",
+      "image": "https://kubernetes.io/images/favicon.png"
     }
   ]
 }

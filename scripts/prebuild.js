@@ -22,12 +22,13 @@ function generateManifest() {
     const posts = files.map(file => {
       const rawContent = fs.readFileSync(path.join(langDir, file), 'utf-8');
       const { data } = matter(rawContent);
-      return {
-        slug: file.replace(/\.md$/, ''),
-        title: data.title || 'Untitled',
-        date: data.date || '1970-01-01',
-        description: data.description || ''
-      };
+          return {
+            slug: file.replace(/\.md$/, ''),
+            title: data.title || 'Untitled',
+            date: data.date || '1970-01-01',
+            description: data.description || '',
+            image: data.image || null
+          };
     }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     manifest[lang] = posts;

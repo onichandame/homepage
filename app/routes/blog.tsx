@@ -27,11 +27,16 @@ export default function Blog() {
       <ul className="space-y-4">
         {posts.map((post: any) => (
           <li key={post.slug} className="border p-4 rounded shadow-sm hover:shadow-md transition-shadow">
-            <Link to={`/${lang}/blog/${post.slug}`} className="block">
-              <h2 className="text-xl font-semibold text-blue-600">{post.title}</h2>
-              <div className="text-sm text-gray-500 mb-2">{post.date}</div>
-              <p className="text-gray-700">{post.description}</p>
-            </Link>
+                <Link to={`/${lang}/blog/${post.slug}`} className="block flex flex-col sm:flex-row gap-4 items-start">
+                  {post.image && (
+                    <img src={post.image} alt={post.title} className="w-full sm:w-32 sm:h-24 object-cover rounded-md flex-shrink-0 shadow-sm" />
+                  )}
+                  <div>
+                    <h2 className="text-xl font-semibold text-blue-600">{post.title}</h2>
+                    <div className="text-sm text-gray-500 mb-2">{post.date}</div>
+                    <p className="text-gray-700">{post.description}</p>
+                  </div>
+                </Link>
           </li>
         ))}
       </ul>

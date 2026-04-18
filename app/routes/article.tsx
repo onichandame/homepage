@@ -19,16 +19,19 @@ export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const { data, content } = matter(rawText);
   const html = await marked.parse(content);
   
-  return { title: data.title || slug, html, date: data.date };
+  return { title: data.title || slug, html, date: data.date, image: data.image };
 }
 
 export default function Article() {
-  const { title, html, date } = useLoaderData<typeof loader>();
+  const { title, html, date, image } = useLoaderData<typeof loader>();
 
   return (
     <article className="max-w-3xl mx-auto py-8 px-4">
       <h1 className="text-4xl font-extrabold mb-2">{title}</h1>
-      {date && <div className="text-gray-500 mb-8">{date}</div>}
+      {date && <div className="text-gray-500 mb-6">{date}</div>}
+      {image && (
+        <img src={image} alt={title} className="w-full max-h-[400px] object-cover rounded-lg mb-8 shadow-md" />
+      )}
           <div
             className="prose dark:prose-invert lg:prose-xl max-w-none"
             dangerouslySetInnerHTML={{ __html: html as string }}

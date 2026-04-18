@@ -105,3 +105,14 @@
   - Stripped the redundant "Core Skills" UI dictionary and section from `app/routes/about.tsx` to strictly enforce the minimalist "Business Card" design philosophy.
 - **New Conventions**:
   - **Content-Level Link Embedding**: When modifying static JSON assets without refactoring the underlying React rendering schema, embed external URLs directly into `description` strings (e.g., `🔗 Access: ...`) to guarantee user accessibility, while optionally keeping a `link` field for future UI iterations.
+
+### Phase 6: Blog Migration & Asset Injection (Completed)
+- **Architecture State**:
+  - Migrated 50+ historical blogs from an external repository into the Edge-Native Markdown Engine (`public/posts/en` and `public/posts/zh`).
+  - Flattened nested `metadata.yaml` structures into standard Markdown Frontmatter (`date`, `image`).
+  - Upgraded `scripts/prebuild.js` to extract and inject the `image` field into `manifest.json`.
+  - Enhanced `blog.tsx` (list view) and `article.tsx` (detail view) to render responsive thumbnail and cover image assets.
+- **Lessons Learned & DON'Ts**:
+  - **DON'T** rely on complex external YAML parsers when simple Regex extraction suffices for flat legacy metadata. This prevents bloated pre-build dependencies.
+- **New Conventions**:
+  - **Asset Propagation**: Whenever a new Frontmatter field (like `image`) is required by the UI, it must be explicitly captured in `scripts/prebuild.js` and exported to `manifest.json`. The Edge-Native UI loaders cannot read Frontmatter directly without fetching the entire markdown file, so the manifest acts as the central index.
