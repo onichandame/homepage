@@ -22,3 +22,7 @@
 - **Cloudflare Integration:** Use `@cloudflare/vite-plugin` in Vite config.
 - **RR Config:** Ensure `future.v8_viteEnvironmentApi` is active.
 - **Styling:** Standardized on Tailwind utility classes. Global CSS resets and custom variables live in `app/app.css`.
+- **SEO/Meta Management:** (New) Standardize meta tag generation. Future route additions should consider a shared `app/utils/seo.ts` factory function to prevent duplication.
+
+## 4. Future Architecture Evolution
+- **Data Decoupling (Blog & Timeline):** Migrate hardcoded static data (e.g., Career Timeline, Core Skills) to Cloudflare KV or D1 databases. Utilize React Router v7's `loader` function to fetch data directly at the Edge for optimal SSR performance.
