@@ -37,3 +37,16 @@
   - **DON'T** pass relative/absolute local paths to `env.ASSETS.fetch()`. It acts as an HTTP router and requires a fully qualified URL (e.g., `new URL("/path", request.url)`).
   - **DON'T** rely on Node.js `fs` module inside RRv7 loaders.
 - **New Conventions:** Run `npm run prebuild` (now integrated into `npm run dev` and `npm run build`) before compiling to ensure the manifest is up-to-date.
+
+### Phase 3.1: Edge-Native i18n Architecture (Completed)
+- **Architecture State**: 
+  - Implemented Subpath Routing (`/:lang/*`) for SEO-friendly multi-language support.
+  - Deployed an Edge Redirector at `app/routes/_index.tsx` that sniffs `Accept-Language` headers and executes 0-latency 302 redirects.
+  - Content physically segregated into `public/posts/en` and `public/posts/zh`.
+  - `manifest.json` generation logic upgraded to support multi-language namespaces.
+- **New Conventions**:
+  - **Zero-Dependency Dict**: DO NOT install `react-i18next`. UI strings are hardcoded in `app/root.tsx` as a micro-dictionary to strictly preserve V8 Isolate bundle size.
+  - `ASSETS.fetch` URLs must now include the language segment: `/posts/${lang}/${slug}.md`.
+- **DON'Ts**:
+  - DON'T use client-side JS for language detection. Always rely on Cloudflare Worker headers in the root loader.
+  - **i18n UI State Preservation**: When building the language switcher, utilize `useLocation().pathname` and regex replacement (`^\/${currentLang}`) to ensure users remain on the current subpath (e.g., `/en/blog/hello` -> `/zh/blog/hello`) instead of being forcibly redirected to the language root.

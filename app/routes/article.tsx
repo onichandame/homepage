@@ -6,8 +6,9 @@ import matter from "gray-matter";
 export async function loader({ request, context, params }: LoaderFunctionArgs) {
   const env = context.cloudflare.env as any;
   const slug = params.slug;
-  
-  const assetUrl = new URL(`/posts/${slug}.md`, request.url);
+  const lang = params.lang === "zh" ? "zh" : "en";
+
+  const assetUrl = new URL(`/posts/${lang}/${slug}.md`, request.url);
   const response = await env.ASSETS.fetch(new Request(assetUrl));
   
   if (!response.ok) {

@@ -6,6 +6,8 @@ import {
   Scripts,
   ScrollRestoration,
   NavLink,
+  useParams,
+  useLocation,
 } from "react-router";
 
 import type { Route } from "./+types/root";
@@ -24,9 +26,24 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+const DICT: Record<string, any> = {
+  en: { home: "Home", about: "About", projects: "Projects", blog: "Blog" },
+  zh: { home: "首页", about: "关于", projects: "项目", blog: "博客" }
+};
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  const params = useParams();
+  const location = useLocation();
+  const lang = params.lang === "zh" ? "zh" : "en";
+  const t = DICT[lang];
+
+  // 动态替换当前路径的语言前缀，实现原地无缝切换
+  const switchPath = (targetLang: string) => {
+    return location.pathname.replace(new RegExp(`^/${lang}`), `/${targetLang}`);
+  };
+
   return (
-    <html lang="en">
+    <html lang={lang}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -35,11 +52,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
         <header className="border-b bg-white p-4 sticky top-0 z-10">
-          <nav className="max-w-4xl mx-auto flex gap-6 font-medium">
-            <NavLink to="/" className="hover:text-blue-600 [&.active]:text-blue-600">Home</NavLink>
-            <NavLink to="/about" className="hover:text-blue-600 [&.active]:text-blue-600">About</NavLink>
-            <NavLink to="/projects" className="hover:text-blue-600 [&.active]:text-blue-600">Projects</NavLink>
-            <NavLink to="/blog" className="hover:text-blue-600 [&.active]:text-blue-600">Blog</NavLink>
+          <nav className="max-w-4xl mx-auto flex gap-6 font-medium items-center">
+            <NavLink to={`/${lang}`} end className="hover:text-blue-600 [&.active]:text-blue-600">{t.home}</NavLink>
+            <NavLink to={`/${lang}/about`} className="hover:text-blue-600 [&.active]:text-blue-600">{t.about}</NavLink>
+            <NavLink to={`/${lang}/projects`} className="hover:text-blue-600 [&.active]:text-blue-600">{t.projects}</NavLink>
+            <NavLink to={`/${lang}/blog`} className="hover:text-blue-600 [&.active]:text-blue-600">{t.blog}</NavLink>
+            <div className="ml-auto text-sm flex gap-2">
+              <NavLink to={switchPath("en")} className="hover:underline opacity-70 [&.active]:opacity-100 [&.active]:font-bold">EN</NavLink>
+              <span className="opacity-50">|</span>
+              <NavLink to={switchPath("zh")} className="hover:underline opacity-70 [&.active]:opacity-100 [&.active]:font-bold">中文</NavLink>
+            </div>
           </nav>
         </header>
         <main className="flex-1 max-w-4xl mx-auto w-full p-6">
