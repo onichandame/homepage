@@ -46,7 +46,7 @@
   - Content physically segregated into `public/posts/en` and `public/posts/zh`.
   - `manifest.json` generation logic upgraded to support multi-language namespaces.
 - **New Conventions**:
-  - **Zero-Dependency Dict**: DO NOT install `react-i18next`. UI strings are hardcoded in `app/root.tsx` as a micro-dictionary to strictly preserve V8 Isolate bundle size.
+  - **Zero-Dependency Dict**: DO NOT install `react-i18next`. UI strings are hardcoded in `app/root.tsx` and specific page components (`home.tsx`, `about.tsx`, `projects.tsx`) as micro-dictionaries using `useParams()`. This strictly preserves V8 Isolate bundle size while enabling seamless dynamic translations.
   - `ASSETS.fetch` URLs must now include the language segment: `/posts/${lang}/${slug}.md`.
 - **DON'Ts**:
   - DON'T use client-side JS for language detection. Always rely on Cloudflare Worker headers in the root loader.
