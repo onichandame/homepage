@@ -32,7 +32,6 @@ export default function About() {
       ? "英国兰卡斯特大学物理学硕士，资深全栈工程师。专注从 0 到 1 构建复杂的 SaaS 平台，并将其从 1 扩展至 100。在带领高绩效工程团队、异构计算资源（如 Slurm 集群）集成以及企业级性能调优方面拥有丰富经验。"
       : "Senior Full Stack Engineer with an MSc in Physics from Lancaster University. I specialize in building complex SaaS platforms from 0 to 1 and scaling them from 1 to 100. Experienced in leading high-performance engineering teams, integrating heterogeneous computing resources (like Slurm clusters), and optimizing enterprise performance.",
     timelineTitle: isZh ? "职业轨迹" : "Career Timeline",
-    skillsTitle: isZh ? "核心技术栈" : "Core Skills",
     jobs
   };
 
@@ -67,22 +66,6 @@ export default function About() {
               ))}
             </div>
           </section>
-
-          <section>
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6">
-              {dict.skillsTitle}
-            </h2>
-        <div className="flex flex-wrap gap-3">
-          {['Node.js', 'TypeScript', 'Rust', 'React', 'Docker', 'Kubernetes', 'MongoDB', 'PostgreSQL', 'Redis', 'Python'].map((skill) => (
-            <span
-              key={skill}
-              className="bg-gray-100 text-gray-800 text-sm font-medium px-4 py-2 rounded-md dark:bg-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-700"
-            >
-              {skill}
-            </span>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }

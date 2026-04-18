@@ -1,20 +1,14 @@
 [
   {
-    "title": "Backend Lead @ Heywhale",
-    "date": "2023 - Present",
-    "desc": "Leading the backend team, driving cross-functional collaboration, and tackling complex technical challenges for enterprise LLM/Compute applications.",
+    "title": "AI & Backend Engineer @ Prodream",
+    "date": "2026 - Present",
+    "desc": "Spearheading backend architecture and data infrastructure, deeply integrating Large Language Models (LLMs) to create innovative AI-native applications and drive intelligent business solutions.",
     "color": "bg-blue-600"
   },
   {
-    "title": "Backend Engineer @ Heywhale",
-    "date": "2020 - 2023",
-    "desc": "Architected the community social system and billing infrastructure from scratch. Upgraded infrastructure with monorepo and distributed message queues.",
-    "color": "bg-gray-300 dark:bg-gray-600"
-  },
-  {
-    "title": "Full Stack Architect @ Gaoying Tech",
-    "date": "2020",
-    "desc": "Led the full-lifecycle development of automated production control and order management systems based on Kubernetes.",
+    "title": "Backend Lead @ Heywhale",
+    "date": "2020 - 2025",
+    "desc": "Led the backend team to build community and billing systems from scratch, drove microservices infrastructure evolution, and overcame technical barriers in enterprise private compute and LLM application delivery.",
     "color": "bg-gray-300 dark:bg-gray-600"
   }
 ]

@@ -1,17 +1,14 @@
 [
   {
-    "name": "Heywhale 数据科学社区",
-    "description": "主导 LLM 应用、社区社交系统与算力计费核心模块。将基础架构升级为 Monorepo 与分布式消息队列。",
-    "tags": ["Rust", "Node.js", "MongoDB", "Redis", "Microservices"]
-  },
-  {
-    "name": "企业级私有化部署",
-    "description": "为企业客户提供异构计算资源（Slurm集群）整合及三方认证系统对接，并使用 Helm 优化交付流水线。",
-    "tags": ["Kubernetes", "Helm", "Golang", "Python", "Enterprise SaaS"]
-  },
-  {
-    "name": "雅思 AI 写作批改系统",
-    "description": "基于大语言模型，为雅思写作批改工具交付高可用的生产环境，管理全套容器化与基础设施。",
-    "tags": ["LLM", "Docker", "Python", "Linux"]
+    "name": "Prompter (大模型提示词管理平台)",
+    "description": "专为 LLM 开发者打造的高效 Prompt 管理与调试平台。提供结构化的提示词版本控制、动态变量渲染及可视化调试工作流，帮助 AI 团队沉淀核心资产。🔗 体验地址: https://prompter.onidame.qzz.io/",
+    "link": "https://prompter.onidame.qzz.io/",
+    "tags": [
+      "LLM",
+      "Prompt Engineering",
+      "AI Tooling",
+      "SvelteKit",
+      "SaaS"
+    ]
   }
 ]

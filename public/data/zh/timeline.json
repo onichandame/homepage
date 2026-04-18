@@ -1,20 +1,14 @@
 [
   {
-    "title": "后端负责人 @ Heywhale",
-    "date": "2023 - Present",
-    "desc": "带领后端团队，推动跨部门协作，攻克企业级 LLM/算力应用的复杂技术难题。",
+    "title": "AI 与后端开发工程师 @ Prodream (助梦空间)",
+    "date": "2026 - Present",
+    "desc": "主导后端架构与数据基础设施建设，深度融合大语言模型（LLM）打造创新的 AI 原生应用体验，驱动业务智能化落地。",
     "color": "bg-blue-600"
   },
   {
-    "title": "后端工程师 @ Heywhale",
-    "date": "2020 - 2023",
-    "desc": "从零架构社区社交系统和计费基础设施。使用 Monorepo 和分布式消息队列升级基础架构。",
-    "color": "bg-gray-300 dark:bg-gray-600"
-  },
-  {
-    "title": "全栈架构师 @ Gaoying Tech",
-    "date": "2020",
-    "desc": "主导基于 Kubernetes 的自动化生产控制与订单管理系统的全生命周期开发。",
+    "title": "后端负责人 @ Heywhale",
+    "date": "2020 - 2025",
+    "desc": "带领后端团队从零构建社区与计费系统，主导微服务基础架构演进，并攻克企业级私有化算力及 LLM 应用交付等技术壁垒。",
     "color": "bg-gray-300 dark:bg-gray-600"
   }
 ]

@@ -98,3 +98,10 @@
   - Re-integrated the Cloudinary avatar with proper cropping and background parameters (`w_1000,c_fill,ar_1:1,g_auto,r_max,b_rgb:262c35`).
 - **New Conventions**:
   - **Minimalism**: Maintain a text-focused, "Shipping solutions, not experiments" philosophy. Avoid unnecessary buttons, redundant links, or verbose descriptions on the index page.
+
+### Phase 5: Profile Data Refresh & Simplification (Completed)
+- **Architecture State**:
+  - Updated JSON data assets (`timeline.json`, `projects.json`) to reflect the 2026 career state (Added Prodream, merged Heywhale, replaced legacy projects with Prompter SaaS).
+  - Stripped the redundant "Core Skills" UI dictionary and section from `app/routes/about.tsx` to strictly enforce the minimalist "Business Card" design philosophy.
+- **New Conventions**:
+  - **Content-Level Link Embedding**: When modifying static JSON assets without refactoring the underlying React rendering schema, embed external URLs directly into `description` strings (e.g., `🔗 Access: ...`) to guarantee user accessibility, while optionally keeping a `link` field for future UI iterations.
