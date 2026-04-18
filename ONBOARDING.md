@@ -74,3 +74,14 @@
 - **UI Refinement (Post-Phase 3.3)**:
   - Removed the large redundant avatar from `home.tsx` to maintain a text-focused, minimalist Hero section ("Shipping solutions, not experiments").
   - Fixed the Cloudinary asset URL for the Favicon in `root.tsx` (removed `b_rgb` background and set width to 128px) to ensure a perfectly transparent, circular, and performant browser tab icon.
+
+### Phase 3.4: Typography & Markdown Styling (Completed)
+- **Architecture State**:
+  - Integrated `@tailwindcss/typography` for robust Markdown styling.
+  - Injected typography classes (`prose`, `lg:prose-xl`, `dark:prose-invert`) directly into the markdown rendering container in `app/routes/article.tsx`.
+  - Activated the typography plugin via the `@plugin` directive directly in `app/app.css` following Tailwind v4 conventions.
+- **Lessons Learned & DON'Ts**:
+  - **DON'T** attempt to configure typography plugins via JS config files in Tailwind v4. The `@plugin` CSS directive is strictly required.
+  - **DON'T** forget `dark:prose-invert` when applying typography to a dark-mode enabled site, otherwise text will remain unreadable against dark backgrounds.
+- **New Conventions**:
+  - **CSS-First Plugin Management**: All Tailwind plugins must be declared in `app/app.css`.

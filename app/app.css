@@ -1,4 +1,5 @@
 @import "tailwindcss" source(".");
+@plugin "@tailwindcss/typography";
 
 /* 劫持系统媒体查询，将暗色模式绑定至 DOM 的 .dark 类 */
 @custom-variant dark (&:where(.dark, .dark *));

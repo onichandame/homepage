@@ -29,10 +29,10 @@ export default function Article() {
     <article className="max-w-3xl mx-auto py-8 px-4">
       <h1 className="text-4xl font-extrabold mb-2">{title}</h1>
       {date && <div className="text-gray-500 mb-8">{date}</div>}
-      <div 
-        className="prose lg:prose-xl max-w-none"
-        dangerouslySetInnerHTML={{ __html: html as string }} 
-      />
+          <div
+            className="prose dark:prose-invert lg:prose-xl max-w-none"
+            dangerouslySetInnerHTML={{ __html: html as string }}
+          />
     </article>
   );
 }
