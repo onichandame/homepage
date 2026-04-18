@@ -85,3 +85,10 @@
   - **DON'T** forget `dark:prose-invert` when applying typography to a dark-mode enabled site, otherwise text will remain unreadable against dark backgrounds.
 - **New Conventions**:
   - **CSS-First Plugin Management**: All Tailwind plugins must be declared in `app/app.css`.
+
+### Phase 3.5: Homepage Minimalist Refactoring (Completed)
+- **Architecture State**:
+  - Refactored `app/routes/home.tsx` from a verbose hero section into a minimalist, responsive Business Card layout.
+  - Re-integrated the Cloudinary avatar with proper cropping and background parameters (`w_1000,c_fill,ar_1:1,g_auto,r_max,b_rgb:262c35`).
+- **New Conventions**:
+  - **Minimalism**: Maintain a text-focused, "Shipping solutions, not experiments" philosophy. Avoid unnecessary buttons, redundant links, or verbose descriptions on the index page.

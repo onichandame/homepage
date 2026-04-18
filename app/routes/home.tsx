@@ -1,4 +1,4 @@
-import { NavLink, useParams } from "react-router";
+import { useParams } from "react-router";
 import { getSeoMeta } from "../utils/seo";
 
 export function meta({ params }: { params: { lang?: string } }) {
@@ -17,40 +17,28 @@ export default function Home() {
   const isZh = lang === "zh";
 
   const dict = {
-    title: isZh ? "你好，我是张筱。" : "Hi, I'm Zhang Xiao.",
-    desc1: isZh ? "设计可扩展的 AI 应用与 SaaS 产品。" : "I design scalable AI applications and SaaS products.",
-    desc2: isZh ? <>以 <strong>Rust</strong> 追求极致性能，以 <strong>K8s</strong> 支撑高并发。</> : <><strong>Rust</strong> for performance. <strong>K8s</strong> for scale.</>,
-    desc3: isZh ? "交付真实的解决方案，而非实验品。" : "Shipping solutions, not experiments.",
-    btnProjects: isZh ? "查看项目" : "View Projects",
-    btnBlog: isZh ? "阅读博客" : "Read Blog",
+    name: isZh ? "张筱" : "Zhang Xiao",
+    role: isZh ? "AI 工程师" : "AI engineer",
+    bio: isZh
+      ? "设计可扩展的 AI 应用与 SaaS 产品。以 Rust 追求极致性能，以 K8s 支撑高并发。交付真实的解决方案，而非实验品。"
+      : "I design scalable AI application and SaaS product. Rust for performance. K8s for scale. Shipping solutions, not experiments."
   };
 
   return (
-    <div className="flex flex-col gap-10 py-12">
-      <section className="space-y-6">
-        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl dark:text-white">
-          {dict.title}
-        </h1>
-        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
-          {dict.desc1}<br/>
-          {dict.desc2}<br/>
-          {dict.desc3}
+    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8 py-16 max-w-3xl">
+      <img
+        src="https://res.cloudinary.com/onichandame/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,b_rgb:262c35/v1747296851/mmexport1728029668566_cropped_y57sqr.png"
+        alt={dict.name}
+        className="w-32 h-32 rounded-full object-cover shadow-sm ring-1 ring-gray-200 dark:ring-gray-800 shrink-0"
+      />
+      <div className="flex flex-col space-y-4 text-center sm:text-left pt-2">
+        <div>
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">{dict.name}</h1>
+          <p className="text-lg text-gray-500 dark:text-gray-400 mt-1 font-medium">{dict.role}</p>
+        </div>
+        <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed max-w-lg">
+          {dict.bio}
         </p>
-      </section>
-
-      <div className="flex flex-wrap gap-4 pt-2">
-        <NavLink
-          to={`/${lang}/projects`}
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 text-base font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
-        >
-          {dict.btnProjects}
-        </NavLink>
-        <NavLink
-          to={`/${lang}/blog`}
-          className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-colors shadow-sm"
-        >
-          {dict.btnBlog}
-        </NavLink>
       </div>
     </div>
   );
