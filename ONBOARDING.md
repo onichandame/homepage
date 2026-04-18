@@ -50,3 +50,15 @@
 - **DON'Ts**:
   - DON'T use client-side JS for language detection. Always rely on Cloudflare Worker headers in the root loader.
   - **i18n UI State Preservation**: When building the language switcher, utilize `useLocation().pathname` and regex replacement (`^\/${currentLang}`) to ensure users remain on the current subpath (e.g., `/en/blog/hello` -> `/zh/blog/hello`) instead of being forcibly redirected to the language root.
+
+### Phase 3.2: Edge-Native Dark Mode & Tailwind v4 (Completed)
+- **Architecture State**: 
+  - Integrated Tailwind CSS v4 using the "CSS-first" paradigm.
+  - Implemented Class-based Dark Mode by hijacking the default media query via `@custom-variant dark (&:where(.dark, .dark *));` in `app/app.css`.
+  - Added an inline vanilla JS FOUC (Flash of Unstyled Content) prevention script in `app/root.tsx` `<head>` to evaluate `localStorage` and system preference before React hydration.
+- **Lessons Learned & DON'Ts**:
+  - **DON'T** attempt to use `tailwind.config.js/ts` or `darkMode: 'class'` for Tailwind v4. The JS config is completely deprecated.
+  - **DON'T** rely solely on React state (`useState`/`useEffect`) for initial dark mode rendering. In SSR/Cloudflare Worker environments, this guarantees a white screen flash before hydration completes. The blocking `<script>` in `<head>` is strictly required.
+- **New Conventions**:
+  - **CSS-First Theming**: All Tailwind configuration and theme variables must reside strictly in `app/app.css`.
+  - **Theme State Management**: The Theme Toggle button must update both `document.documentElement.classList` and `localStorage` simultaneously to maintain sync with the FOUC script.

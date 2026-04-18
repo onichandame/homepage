@@ -9,6 +9,7 @@ import {
   useParams,
   useLocation,
 } from "react-router";
+import { useState, useEffect } from "react";
 
 import type { Route } from "./+types/root";
 import "./app.css";
@@ -31,11 +32,46 @@ const DICT: Record<string, any> = {
   zh: { home: "首页", about: "关于", projects: "项目", blog: "博客" }
 };
 
+// 避免 FOUC (闪烁) 的防线：在 React Hydration 前执行
+const ThemeScript = () => (
+  <script
+    dangerouslySetInnerHTML={{
+      __html: `
+        (function() {
+          try {
+            var storedTheme = localStorage.getItem('theme');
+            var isDark = storedTheme === 'dark' || (!storedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+            if (isDark) document.documentElement.classList.add('dark');
+          } catch (e) {}
+        })();
+      `,
+    }}
+  />
+);
+
 export function Layout({ children }: { children: React.ReactNode }) {
   const params = useParams();
   const location = useLocation();
   const lang = params.lang === "zh" ? "zh" : "en";
   const t = DICT[lang];
+  
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
+
+  const toggleTheme = () => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    } else {
+      root.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    }
+    setIsDark(!isDark);
+  };
 
   // 动态替换当前路径的语言前缀，实现原地无缝切换
   const switchPath = (targetLang: string) => {
@@ -43,24 +79,36 @@ export function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <html lang={lang}>
+    <html lang={lang} suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <ThemeScript />
       </head>
-      <body className="bg-gray-50 text-gray-900 font-sans flex flex-col min-h-screen">
-        <header className="border-b bg-white p-4 sticky top-0 z-10">
+      <body className="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans flex flex-col min-h-screen transition-colors duration-300">
+        <header className="border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4 sticky top-0 z-10 transition-colors duration-300">
           <nav className="max-w-4xl mx-auto flex gap-6 font-medium items-center">
-            <NavLink to={`/${lang}`} end className="hover:text-blue-600 [&.active]:text-blue-600">{t.home}</NavLink>
-            <NavLink to={`/${lang}/about`} className="hover:text-blue-600 [&.active]:text-blue-600">{t.about}</NavLink>
-            <NavLink to={`/${lang}/projects`} className="hover:text-blue-600 [&.active]:text-blue-600">{t.projects}</NavLink>
-            <NavLink to={`/${lang}/blog`} className="hover:text-blue-600 [&.active]:text-blue-600">{t.blog}</NavLink>
-            <div className="ml-auto text-sm flex gap-2">
-              <NavLink to={switchPath("en")} className="hover:underline opacity-70 [&.active]:opacity-100 [&.active]:font-bold">EN</NavLink>
-              <span className="opacity-50">|</span>
-              <NavLink to={switchPath("zh")} className="hover:underline opacity-70 [&.active]:opacity-100 [&.active]:font-bold">中文</NavLink>
+            <NavLink to={`/${lang}`} end className="hover:text-blue-600 dark:hover:text-blue-400 [&.active]:text-blue-600 dark:[&.active]:text-blue-400">{t.home}</NavLink>
+            <NavLink to={`/${lang}/about`} className="hover:text-blue-600 dark:hover:text-blue-400 [&.active]:text-blue-600 dark:[&.active]:text-blue-400">{t.about}</NavLink>
+            <NavLink to={`/${lang}/projects`} className="hover:text-blue-600 dark:hover:text-blue-400 [&.active]:text-blue-600 dark:[&.active]:text-blue-400">{t.projects}</NavLink>
+            <NavLink to={`/${lang}/blog`} className="hover:text-blue-600 dark:hover:text-blue-400 [&.active]:text-blue-600 dark:[&.active]:text-blue-400">{t.blog}</NavLink>
+            
+            <div className="ml-auto flex items-center gap-4">
+              <button 
+                onClick={toggleTheme}
+                className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300 focus:outline-none"
+                aria-label="Toggle Dark Mode"
+              >
+                {isDark ? "☀️" : "🌙"}
+              </button>
+              
+              <div className="text-sm flex gap-2 items-center">
+                <NavLink to={switchPath("en")} className="hover:underline opacity-70 [&.active]:opacity-100 [&.active]:font-bold">EN</NavLink>
+                <span className="opacity-50">|</span>
+                <NavLink to={switchPath("zh")} className="hover:underline opacity-70 [&.active]:opacity-100 [&.active]:font-bold">中文</NavLink>
+              </div>
             </div>
           </nav>
         </header>
