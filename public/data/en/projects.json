@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Heywhale Data Science Community",
+    "description": "Core features including LLM applications, social systems, and compute billing. Upgraded infrastructure to monorepo and distributed message queues.",
+    "tags": ["Rust", "Node.js", "MongoDB", "Redis", "Microservices"]
+  },
+  {
+    "name": "Enterprise Private Deployments",
+    "description": "Heterogeneous resource integration (Slurm clusters) and third-party auth systems for enterprise clients. Optimized operations using Helm.",
+    "tags": ["Kubernetes", "Helm", "Golang", "Python", "Enterprise SaaS"]
+  },
+  {
+    "name": "IELTS AI Writing Grader",
+    "description": "Delivered a production environment for an IELTS writing correction tool powered by Large Language Models. Managed containerization and infra.",
+    "tags": ["LLM", "Docker", "Python", "Linux"]
+  }
+]

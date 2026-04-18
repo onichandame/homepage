@@ -1,0 +1,20 @@
+[
+  {
+    "title": "后端负责人 @ Heywhale",
+    "date": "2023 - Present",
+    "desc": "带领后端团队，推动跨部门协作，攻克企业级 LLM/算力应用的复杂技术难题。",
+    "color": "bg-blue-600"
+  },
+  {
+    "title": "后端工程师 @ Heywhale",
+    "date": "2020 - 2023",
+    "desc": "从零架构社区社交系统和计费基础设施。使用 Monorepo 和分布式消息队列升级基础架构。",
+    "color": "bg-gray-300 dark:bg-gray-600"
+  },
+  {
+    "title": "全栈架构师 @ Gaoying Tech",
+    "date": "2020",
+    "desc": "主导基于 Kubernetes 的自动化生产控制与订单管理系统的全生命周期开发。",
+    "color": "bg-gray-300 dark:bg-gray-600"
+  }
+]

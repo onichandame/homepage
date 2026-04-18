@@ -25,8 +25,14 @@
 - **Styling:** Standardized on Tailwind utility classes. Global CSS resets and custom variables live in `app/app.css`.
 - **SEO/Meta Management:** (New) Standardize meta tag generation. Future route additions should consider a shared `app/utils/seo.ts` factory function to prevent duplication.
 
-## 4. Future Architecture Evolution
-- **Data Decoupling (Timeline & Portfolio):** Migrate hardcoded static data (e.g., Career Timeline, Core Skills) to Cloudflare KV or D1 databases. Utilize React Router v7's `loader` function to fetch data directly at the Edge for optimal SSR performance.
+### Phase 4: Data Architecture & Decoupling (Completed)
+- **Architecture State**:
+  - Successfully decoupled hardcoded business data (Career Timeline, Portfolio Projects) from React components into static JSON files segregated by language (`public/data/en/`, `public/data/zh/`).
+  - Implemented React Router v7 `loader` functions to fetch these JSONs at the Edge using Cloudflare `context.cloudflare.env.ASSETS.fetch()`.
+- **Lessons Learned & DON'Ts**:
+  - **DON'T** unnecessarily introduce stateful or external databases (like Cloudflare KV or D1) for purely static business data. Always default to Edge-Native static assets (`env.ASSETS`) to maintain architectural simplicity, zero-latency reads, and minimize infrastructure overhead.
+- **New Conventions**:
+  - **Zero-Dependency Dict**: UI micro-dictionaries remain inside components, while pure business arrays (`jobs`, `projects`) are fetched from `public/data/`.
 
 ## 5. Blog Engine Architecture (Phase 2 Closure)
 - **Architecture State:** Migrated blog data flow to an Edge-Native Markdown Engine.

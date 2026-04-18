@@ -1,5 +1,13 @@
-import { useParams } from "react-router";
+import { useLoaderData, useParams } from "react-router";
 import { getSeoMeta } from "../utils/seo";
+
+export async function loader({ request, params, context }: any) {
+  const lang = params.lang === "zh" ? "zh" : "en";
+  const url = new URL(`/data/${lang}/timeline.json`, request.url);
+  const res = await context.cloudflare.env.ASSETS.fetch(url);
+  if (!res.ok) throw new Response("Timeline data not found", { status: 404 });
+  return await res.json();
+}
 
 export function meta({ params }: { params: { lang?: string } }) {
   const isZh = params.lang === "zh";
@@ -13,6 +21,7 @@ export function meta({ params }: { params: { lang?: string } }) {
 }
 
 export default function About() {
+  const jobs = useLoaderData() as any[];
   const { lang } = useParams();
   const isZh = lang === "zh";
   const avatarUrl = "https://res.cloudinary.com/onichandame/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,b_rgb:262c35/v1747296851/mmexport1728029668566_cropped_y57sqr.png";
@@ -24,26 +33,7 @@ export default function About() {
       : "Senior Full Stack Engineer with an MSc in Physics from Lancaster University. I specialize in building complex SaaS platforms from 0 to 1 and scaling them from 1 to 100. Experienced in leading high-performance engineering teams, integrating heterogeneous computing resources (like Slurm clusters), and optimizing enterprise performance.",
     timelineTitle: isZh ? "职业轨迹" : "Career Timeline",
     skillsTitle: isZh ? "核心技术栈" : "Core Skills",
-    jobs: [
-      {
-        title: isZh ? "后端负责人 @ Heywhale" : "Backend Lead @ Heywhale",
-        date: "2023 - Present",
-        desc: isZh ? "带领后端团队，推动跨部门协作，攻克企业级 LLM/算力应用的复杂技术难题。" : "Leading the backend team, driving cross-functional collaboration, and tackling complex technical challenges for enterprise LLM/Compute applications.",
-        color: "bg-blue-600"
-      },
-      {
-        title: isZh ? "后端工程师 @ Heywhale" : "Backend Engineer @ Heywhale",
-        date: "2020 - 2023",
-        desc: isZh ? "从零架构社区社交系统和计费基础设施。使用 Monorepo 和分布式消息队列升级基础架构。" : "Architected the community social system and billing infrastructure from scratch. Upgraded infrastructure with monorepo and distributed message queues.",
-        color: "bg-gray-300 dark:bg-gray-600"
-      },
-      {
-        title: isZh ? "全栈架构师 @ Gaoying Tech" : "Full Stack Architect @ Gaoying Tech",
-        date: "2020",
-        desc: isZh ? "主导基于 Kubernetes 的自动化生产控制与订单管理系统的全生命周期开发。" : "Led the full-lifecycle development of automated production control and order management systems based on Kubernetes.",
-        color: "bg-gray-300 dark:bg-gray-600"
-      }
-    ]
+    jobs
   };
 
   return (
