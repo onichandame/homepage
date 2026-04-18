@@ -63,3 +63,11 @@
 - **New Conventions**:
   - **CSS-First Theming**: All Tailwind configuration and theme variables must reside strictly in `app/app.css`.
   - **Theme State Management**: The Theme Toggle button must update both `document.documentElement.classList` and `localStorage` simultaneously to maintain sync with the FOUC script.
+
+### Phase 3.3: SEO Infrastructure & Profile Content (Completed)
+- **Architecture State**:
+  - Implemented `app/utils/seo.ts` as a centralized factory for generating OpenGraph and Twitter meta tags.
+  - Injected dynamic, i18n-aware `meta` exports into `home.tsx`, `about.tsx`, and `projects.tsx`.
+  - Integrated user profile data (avatar, bio, project history) directly into the React components.
+- **New Conventions**:
+  - **SEO Factory**: All new routes must utilize `getSeoMeta` from `app/utils/seo.ts` rather than hardcoding meta arrays.
