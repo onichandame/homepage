@@ -13,7 +13,7 @@ BEGIN {
     n_search = 0
     while ((getline < s_file) > 0) {
         n_search++; search_lines[n_search] = $0
-        comp = $0; sub(/[ \t\r]+$/, "", comp); search_comp[n_search] = comp
+        comp = $0; sub(/^[ \t]+/, "", comp); sub(/[ \t\r]+$/, "", comp); search_comp[n_search] = comp
     }
     close(s_file)
 
@@ -26,7 +26,7 @@ BEGIN {
     n_target = 0
     while ((getline < t_file) > 0) {
         n_target++; target_lines[n_target] = $0
-        comp = $0; sub(/[ \t\r]+$/, "", comp); target_comp[n_target] = comp
+        comp = $0; sub(/^[ \t]+/, "", comp); sub(/[ \t\r]+$/, "", comp); target_comp[n_target] = comp
     }
     close(t_file)
 
@@ -59,6 +59,5 @@ else
     EXIT_CODE=1
 fi
 
-# 清理并透传正确的退出码
 rm -f "$PATCH_TMP" "$SEARCH_TMP" "$REPLACE_TMP"
 exit $EXIT_CODE

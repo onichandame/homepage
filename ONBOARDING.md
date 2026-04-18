@@ -26,3 +26,14 @@
 
 ## 4. Future Architecture Evolution
 - **Data Decoupling (Blog & Timeline):** Migrate hardcoded static data (e.g., Career Timeline, Core Skills) to Cloudflare KV or D1 databases. Utilize React Router v7's `loader` function to fetch data directly at the Edge for optimal SSR performance.
+
+## 5. Blog Engine Architecture (Phase 2 Closure)
+- **Architecture State:** Migrated blog data flow to an Edge-Native Markdown Engine.
+  - **Pre-build:** Node.js script (`scripts/prebuild.js`) scans `public/posts/*.md` and generates a `manifest.json`.
+  - **Runtime Fetching:** RRv7 loaders utilize Cloudflare `ASSETS.fetch()` to request the manifest and raw markdown files directly from the edge cache.
+  - **Rendering:** Markdown is parsed at the edge using `gray-matter` and `marked`.
+- **Lessons Learned & DON'Ts:**
+  - **DON'T** use Vite's `import.meta.glob` for scaling markdown content in Cloudflare Workers, as it quickly breaches the 1MB/10MB JS bundle size limit.
+  - **DON'T** pass relative/absolute local paths to `env.ASSETS.fetch()`. It acts as an HTTP router and requires a fully qualified URL (e.g., `new URL("/path", request.url)`).
+  - **DON'T** rely on Node.js `fs` module inside RRv7 loaders.
+- **New Conventions:** Run `npm run prebuild` (now integrated into `npm run dev` and `npm run build`) before compiling to ensure the manifest is up-to-date.

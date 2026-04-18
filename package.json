@@ -3,16 +3,19 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "react-router build",
+    "prebuild": "node scripts/prebuild.js",
+    "build": "npm run prebuild && react-router build",
     "cf-typegen": "wrangler types",
     "deploy": "npm run build && wrangler deploy",
-    "dev": "react-router dev",
+    "dev": "npm run prebuild && react-router dev",
     "postinstall": "npm run cf-typegen",
     "preview": "npm run build && vite preview",
     "typecheck": "npm run cf-typegen && react-router typegen && tsc -b"
   },
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "isbot": "^5.1.31",
+    "marked": "^18.0.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-router": "^7.10.0"

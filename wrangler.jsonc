@@ -5,9 +5,13 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "homepage3",
-	"compatibility_date": "2025-04-04",
-	"main": "./workers/app.ts",
-	"vars": {
+        "compatibility_date": "2025-04-04",
+        "main": "./workers/app.ts",
+        "assets": {
+            "directory": "./build/client",
+            "binding": "ASSETS"
+        },
+        "vars": {
 		"VALUE_FROM_CLOUDFLARE": "Hello from Cloudflare"
 	},
 	"observability": {
