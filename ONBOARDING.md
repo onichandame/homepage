@@ -71,3 +71,6 @@
   - Integrated user profile data (avatar, bio, project history) directly into the React components.
 - **New Conventions**:
   - **SEO Factory**: All new routes must utilize `getSeoMeta` from `app/utils/seo.ts` rather than hardcoding meta arrays.
+- **UI Refinement (Post-Phase 3.3)**:
+  - Removed the large redundant avatar from `home.tsx` to maintain a text-focused, minimalist Hero section ("Shipping solutions, not experiments").
+  - Fixed the Cloudinary asset URL for the Favicon in `root.tsx` (removed `b_rgb` background and set width to 128px) to ensure a perfectly transparent, circular, and performant browser tab icon.

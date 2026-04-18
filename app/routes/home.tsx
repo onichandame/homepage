@@ -13,28 +13,17 @@ export function meta({ params }: { params: { lang?: string } }) {
 }
 
 export default function Home() {
-  const avatarUrl = "https://res.cloudinary.com/onichandame/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,b_rgb:262c35/v1747296851/mmexport1728029668566_cropped_y57sqr.png";
-
   return (
     <div className="flex flex-col gap-10 py-12">
-      <section className="flex flex-col-reverse md:flex-row items-center justify-between gap-8">
-        <div className="space-y-6 flex-1">
-          <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl dark:text-white">
-            Hi, I'm Zhang Xiao.
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
-            I design scalable AI applications and SaaS products.<br/>
-            <strong>Rust</strong> for performance. <strong>K8s</strong> for scale.<br/>
-            Shipping solutions, not experiments.
-          </p>
-        </div>
-        <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0">
-          <img 
-            src={avatarUrl} 
-            alt="Zhang Xiao" 
-            className="w-full h-full object-cover shadow-2xl rounded-full border-4 border-white dark:border-gray-800"
-          />
-        </div>
+      <section className="space-y-6">
+        <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-6xl dark:text-white">
+          Hi, I'm Zhang Xiao.
+        </h1>
+        <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl leading-relaxed">
+          I design scalable AI applications and SaaS products.<br/>
+          <strong>Rust</strong> for performance. <strong>K8s</strong> for scale.<br/>
+          Shipping solutions, not experiments.
+        </p>
       </section>
 
       <div className="flex flex-wrap gap-4 pt-2">

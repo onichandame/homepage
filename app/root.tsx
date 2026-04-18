@@ -15,6 +15,11 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
+  {
+    rel: "icon",
+    type: "image/png",
+    href: "https://res.cloudinary.com/onichandame/image/upload/w_128,c_fill,ar_1:1,g_auto,r_max/v1747296851/mmexport1728029668566_cropped_y57sqr.png"
+  },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   {
     rel: "preconnect",
